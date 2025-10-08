@@ -85,8 +85,6 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'substansi' => null,
-      'order' => null,
       'email_requestor' => $request->email_requestor,
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
