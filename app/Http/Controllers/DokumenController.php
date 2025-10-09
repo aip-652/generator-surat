@@ -112,12 +112,13 @@ class DokumenController extends Controller
     $bulanRomawi = $this->getRomawi($tanggal->format('m'));
     $tahun = $tanggal->format('Y');
 
-    // 2. Menghitung nomor urut total berdasarkan kode surat
-    $nomorTerakhir = Dokumen::where('jenis_dokumen', 'surat_keluar')
+    // 2. Menghitung nomor urut harian berdasarkan kode surat
+    $nomorUrutHariIni = Dokumen::where('jenis_dokumen', 'surat_keluar')
       ->where('kode_surat', $kodeSuratCode)
+      ->whereDate('tanggal', $tanggal->toDateString()) // <-- KUNCI PERUBAHANNYA DI SINI
       ->count();
 
-    $nomorUrut = $nomorTerakhir + 1;
+    $nomorUrut = $nomorUrutHariIni + 1;
     $nomorUrutTigaDigit = str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
 
     // 3. Membentuk nomor surat: SK-001.03/72425/X/2025
@@ -130,8 +131,6 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'substansi' => null,
-      'order' => null,
       'email_requestor' => $request->email_requestor,
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
@@ -171,7 +170,7 @@ class DokumenController extends Controller
 
     $dokumens->orderBy($orderBy, $sort);
 
-    $dokumens = $dokumens->get();
+    $dokumens = $dokumens->paginate(15);
 
     return view('dokumen.admin', compact('dokumens', 'filterJenis', 'orderBy', 'sort', 'search'));
   }

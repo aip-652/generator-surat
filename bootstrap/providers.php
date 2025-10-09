@@ -2,4 +2,4 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-];
+  ];
