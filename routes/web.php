@@ -8,9 +8,8 @@ Route::get('/', function () {
   return view('auth.login');
 });
 
-Route::get('/dashboard', function () {
-  return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DokumenController::class, 'adminDashboard'])
+->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
   Route::get('/landing', function () {
@@ -28,10 +27,10 @@ Route::middleware('auth')->group(function () {
   Route::get('/surat/create', [DokumenController::class, 'createSuratKeluar'])->name('dokumen.create.surat');
   Route::post('/surat', [DokumenController::class, 'storeSuratKeluar'])->name('dokumen.store.surat');
   
-  // Routes untuk admin dashboard dengan password
-  Route::group(['middleware' => ['auth']], function () {
-    Route::get('/admin/dashboard', [DokumenController::class, 'adminDashboard'])->name('admin.dashboard');
-  });
+  // // Routes untuk admin dashboard dengan password
+  // Route::group(['middleware' => ['auth']], function () {
+  //   Route::get('/admin/dashboard', [DokumenController::class, 'adminDashboard'])->name('admin.dashboard');
+  // });
 });
 
 

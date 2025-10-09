@@ -10,9 +10,17 @@
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 md:p-8 bg-white border-b border-gray-200">
 
-          <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:outline-none focus:border-gray-500 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 mb-6">
-            <i class="fas fa-arrow-left mr-2"></i> Kembali
-          </a>
+          <div class="flex items-center mb-8">
+            <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-150">
+              <i class="fas fa-arrow-left text-gray-700"></i>
+            </a>
+
+            <h1 class="text-xl font-bold text-gray-800 ml-7">
+              Memo Internal
+            </h1>
+
+            <div class="w-10 h-10"></div>
+          </div>
 
           @if (session('success'))
           <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded" role="alert">
@@ -35,7 +43,7 @@
             @csrf
 
             <div>
-              <x-input-label for="unit_kerja" :value="__('Unit Kerja (Nama Lengkap)')" />
+              <x-input-label for="unit_kerja" :value="__('Unit Kerja')" />
               <x-select-input id="unit_kerja" name="unit_kerja" class="block mt-1 w-full" required>
                 <option value="" disabled selected>-- Pilih Unit Kerja --</option>
                 @foreach($unitKerja as $unit)
@@ -54,21 +62,21 @@
             </div>
 
             <div>
-              <x-input-label for="kepada" :value="__('Kepada (Penerima)')" />
+              <x-input-label for="kepada" :value="__('Kepada')" />
               <x-text-input id="kepada" class="block mt-1 w-full" type="text" name="kepada" :value="old('kepada')" placeholder="Contoh: Divisi Sumber Daya Manusia" />
               <x-input-error :messages="$errors->get('kepada')" class="mt-2" />
             </div>
 
-            <div>
-              <x-input-label for="alamat" :value="__('Tembusan (Opsional)')" />
+            <!-- <div>
+              <x-input-label for="alamat" :value="__('Tujuan')" />
               <x-text-input id="alamat" class="block mt-1 w-full" type="text" name="alamat" :value="old('alamat')" placeholder="Contoh: Divisi Keuangan" />
               <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
-            </div>
+            </div> -->
 
             <div>
-              <x-input-label for="email_requestor" :value="__('Email Pemohon (Requestor)')" />
-              <x-text-input id="email_requestor" class="block mt-1 w-full" type="email" name="email_requestor" :value="old('email_requestor')" required placeholder="email.anda@perusahaan.com" />
-              <x-input-error :messages="$errors->get('email_requestor')" class="mt-2" />
+              <x-input-label for="pic" :value="__('PIC')" />
+              <x-text-input id="pic" class="block mt-1 w-full" type="text" name="pic" :value="old('pic')" required placeholder="Nama penanggung jawab" />
+              <x-input-error :messages="$errors->get('pic')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end">

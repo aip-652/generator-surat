@@ -46,7 +46,7 @@
           </a>
         </div>
         <div class="col-md-4 mb-4">
-          <a href="{{ route('admin.dashboard') }}" class="card-link">
+          <a href="{{ route('dashboard') }}" class="card-link">
             <div class="card p-4 shadow">
               <h3><i class="fas fa-user-shield"></i> Admin Dashboard</h3>
               <p class="mb-0">Lihat semua dokumen</p>

@@ -1,12 +1,12 @@
 <x-app-layout>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-      {{ __('Admin Dashboard: Daftar Dokumen') }}
+      {{ __('Dashboard') }}
     </h2>
   </x-slot>
 
   <div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-full mx-auto sm:px-12 lg:px-26">
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 bg-white border-b border-gray-200">
 
@@ -14,12 +14,70 @@
             <h3 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
               Semua Dokumen Terdaftar
             </h3>
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
-              <i class="fas fa-plus mr-2"></i> Buat Dokumen Baru
-            </a>
+            <div x-data="{ open: false }" class="relative inline-block text-left">
+              <div x-data="{ open: false }" class="relative inline-block text-left">
+                <div>
+                  <button @click="open = !open" type="button" class="inline-flex items-center justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 transition ease-in-out duration-150" id="menu-button">
+                    Buat Dokumen Baru
+                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div
+                  x-show="open"
+                  @click.away="open = false"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="transform opacity-0 scale-95"
+                  x-transition:enter-end="transform opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="transform opacity-100 scale-100"
+                  x-transition:leave-end="transform opacity-0 scale-95"
+                  class="origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-indigo-50 ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                  role="menu"
+                  style="display: none;">
+                  <div class="py-1" role="none">
+                    <a href="{{ route('dokumen.create.memo') }}" class="flex items-center px-4 py-2 text-sm text-indigo-800 hover:bg-indigo-100" role="menuitem">
+                      <i class="fas fa-file-alt fa-fw mr-2 text-indigo-400"></i>
+                      <span>Buat Memo Internal</span>
+                    </a>
+                    <a href="{{ route('dokumen.create.surat') }}" class="flex items-center px-4 py-2 text-sm text-indigo-800 hover:bg-indigo-100" role="menuitem">
+                      <i class="fas fa-envelope fa-fw mr-2 text-indigo-400"></i>
+                      <span>Buat Surat Keluar</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                x-show="open"
+                @click.away="open = false"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="menu-button"
+                tabindex="-1"
+                style="display: none;">
+                <div class="py-1" role="none">
+                  <a href="{{ route('dokumen.create.memo') }}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">
+                    <i class="fas fa-file-alt w-5 mr-2"></i> Buat Memo Internal
+                  </a>
+                  <a href="{{ route('dokumen.create.surat') }}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">
+                    <i class="fas fa-envelope w-5 mr-2"></i> Buat Surat Keluar
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <form action="{{ route('admin.dashboard') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+          <form action="{{ route('dashboard') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
             <div class="sm:col-span-1">
               <x-input-label for="jenis" :value="__('Filter Jenis')" />
               <x-select-input id="jenis" name="jenis" class="block mt-1 w-full" onchange="this.form.submit()">
@@ -45,7 +103,7 @@
                 <tr>
                   @php
                   // Helper function to build sorting URL
-                  $sortLink = fn($orderByField) => route('admin.dashboard', array_merge(request()->query(), ['order_by' => $orderByField, 'sort' => request('sort') === 'asc' ? 'desc' : 'asc']));
+                  $sortLink = fn($orderByField) => route('dashboard', array_merge(request()->query(), ['order_by' => $orderByField, 'sort' => request('sort') === 'asc' ? 'desc' : 'asc']));
                   @endphp
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('jenis_dokumen') }}" class="hover:underline">Jenis</a></th>
@@ -53,6 +111,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('tanggal') }}" class="hover:underline">Tanggal</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('perihal') }}" class="hover:underline">Perihal</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">PIC</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">Requestor</a></th>
                 </tr>
               </thead>
@@ -75,6 +134,7 @@
                   <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($dokumen->tanggal)->format('d/m/Y') }}</td>
                   <td class="px-6 py-4">{{ $dokumen->perihal }}</td>
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
+                  <td class="px-6 py-4">{{ $dokumen->pic }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->email_requestor }}</td>
                 </tr>
                 @empty

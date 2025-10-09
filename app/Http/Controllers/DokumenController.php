@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Dokumen;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DokumenController extends Controller
 {
@@ -19,10 +20,17 @@ class DokumenController extends Controller
 
   // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
   protected $kodeSuratMap = [
-    'Surat Keterangan' => 'SK',
-    'Surat Peringatan' => 'SP',
-    'Perjanjian Kerja' => 'PK',
-    'Keputusan Proyek' => 'KP',
+    'Surat' => 'S',
+    'BA Nego' => 'BA-NEG',
+    'Perjanjian' => 'P',
+    'Surat Keputusan' => 'SK',
+    'Berita Acara' => 'BA',
+    'Berita Acara Serah Terima' => 'BAST',
+    'Berita Acara Kesepakatan' => 'BAK',
+    'Surat Perintah' => 'SPK',
+    'Kebijakan' => 'K',
+    'Retur Promosi' => 'SRP',
+    'Offering Letter' => 'OL',
   ];
 
   /**
@@ -55,7 +63,7 @@ class DokumenController extends Controller
       'perihal' => 'required',
       'kepada' => 'nullable',
       'alamat' => 'nullable',
-      'email_requestor' => 'required|email',
+      'pic' => 'required|string',
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -85,7 +93,8 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'email_requestor' => $request->email_requestor,
+      'pic' => $request->pic, // <-- Ambil dari input
+      'email_requestor' => Auth::user()->email, // <-- Ambil otomatis dari user login      
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 
@@ -102,7 +111,7 @@ class DokumenController extends Controller
       'perihal' => 'required',
       'kepada' => 'nullable',
       'alamat' => 'nullable',
-      'email_requestor' => 'required|email',
+      'pic' => 'required|string', // Validasi untuk PIC    
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -131,7 +140,8 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'email_requestor' => $request->email_requestor,
+      'pic' => $request->pic, // <-- Ambil dari input
+      'email_requestor' => Auth::user()->email, // <-- Ambil otomatis dari user login      
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 

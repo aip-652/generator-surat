@@ -22,8 +22,7 @@ class Dokumen extends Model
     'perihal',
     'kepada',
     'alamat',
-    'substansi',
-    'order',
+    'pic',
     'email_requestor', // Nama field baru
     'tanggal',
   ];

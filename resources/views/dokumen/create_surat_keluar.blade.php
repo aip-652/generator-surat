@@ -10,9 +10,17 @@
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 md:p-8 bg-white border-b border-gray-200">
 
-          <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:outline-none focus:border-gray-500 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 mb-6">
-            <i class="fas fa-arrow-left mr-2"></i> Kembali
-          </a>
+          <div class="flex items-center mb-8">
+            <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-150">
+              <i class="fas fa-arrow-left text-gray-700"></i>
+            </a>
+
+            <h1 class="text-xl font-bold text-gray-800 ml-7">
+              Surat Eksternal
+            </h1>
+
+            <div class="w-10 h-10"></div>
+          </div>
 
           @if (session('success'))
           <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded" role="alert">
@@ -66,9 +74,9 @@
             </div>
 
             <div>
-              <x-input-label for="email_requestor" :value="__('Email Requestor')" />
-              <x-text-input id="email_requestor" class="block mt-1 w-full" type="email" name="email_requestor" :value="old('email_requestor')" required placeholder="email.anda@perusahaan.com" />
-              <x-input-error :messages="$errors->get('email_requestor')" class="mt-2" />
+              <x-input-label for="pic" :value="__('PIC')" />
+              <x-text-input id="pic" class="block mt-1 w-full" type="text" name="pic" :value="old('pic')" required placeholder="Nama penanggung jawab" />
+              <x-input-error :messages="$errors->get('pic')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end">
