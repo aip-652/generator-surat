@@ -14,16 +14,22 @@
             <h3 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
               Semua Dokumen Terdaftar
             </h3>
-            <div x-data="{ open: false }" class="relative inline-block text-left">
+            <div class="flex items-center space-x-4">
+
+              @if(Auth::user()->role === 'admin')
+              <a href="{{ route('users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-sm text-white tracking-widest hover:bg-gray-700">
+                <i class="fas fa-users-cog mr-2"></i>
+                Manage Users
+              </a>
+              @endif
+
               <div x-data="{ open: false }" class="relative inline-block text-left">
-                <div>
-                  <button @click="open = !open" type="button" class="inline-flex items-center justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 transition ease-in-out duration-150" id="menu-button">
-                    Buat Dokumen Baru
-                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
+                <button @click="open = !open" type="button" class="inline-flex items-center justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 transition ease-in-out duration-150" id="menu-button">
+                  Buat Dokumen Baru
+                  <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
 
                 <div
                   x-show="open"
@@ -49,31 +55,6 @@
                   </div>
                 </div>
               </div>
-
-              <div
-                x-show="open"
-                @click.away="open = false"
-                x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="transform opacity-0 scale-95"
-                x-transition:enter-end="transform opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-75"
-                x-transition:leave-start="transform opacity-100 scale-100"
-                x-transition:leave-end="transform opacity-0 scale-95"
-                class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="menu-button"
-                tabindex="-1"
-                style="display: none;">
-                <div class="py-1" role="none">
-                  <a href="{{ route('dokumen.create.memo') }}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">
-                    <i class="fas fa-file-alt w-5 mr-2"></i> Buat Memo Internal
-                  </a>
-                  <a href="{{ route('dokumen.create.surat') }}" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">
-                    <i class="fas fa-envelope w-5 mr-2"></i> Buat Surat Keluar
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -90,8 +71,8 @@
               <x-input-label for="search" :value="__('Cari Dokumen')" />
               <div class="flex mt-1">
                 <x-text-input id="search" class="block w-full rounded-r-none" type="text" name="search" :value="request('search')" placeholder="Cari perihal atau nomor surat..." />
-                <x-primary-button class="rounded-l-none">
-                  {{ __('Cari') }}
+                <x-primary-button class="rounded-l-none px-4">
+                  <i class="fas fa-search"></i>
                 </x-primary-button>
               </div>
             </div>
@@ -113,6 +94,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">PIC</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">Requestor</a></th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -136,6 +118,17 @@
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
                   <td class="px-6 py-4">{{ $dokumen->pic }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->email_requestor }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    @if(Auth::user()->role === 'admin')
+                    <form action="{{ route('dokumen.destroy', $dokumen) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="inline-flex items-center px-2 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
+                        Delete
+                      </button>
+                    </form>
+                    @endif
+                  </td>
                 </tr>
                 @empty
                 <tr>

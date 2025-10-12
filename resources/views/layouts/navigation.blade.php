@@ -14,7 +14,7 @@
         <div class="hidden sm:flex sm:items-center sm:ms-6">
           @isset($header)
 
-          <h1 class="text-lg font-semibold text-gray-800">
+          <h1 class="text-3xl font-bold text-gray-800">
             {{ $header }}
           </h1>
           @endisset
@@ -38,7 +38,7 @@
 
           <x-slot name="content">
             <x-dropdown-link :href="route('profile.edit')">
-              {{ __('Profile') }}
+              {{ __('Ubah Password') }}
             </x-dropdown-link>
 
             <!-- Authentication -->

@@ -12,10 +12,36 @@ class DokumenController extends Controller
 {
   // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
   protected $unitKerjaMap = [
-    'Information Technology' => 'IT',
-    'Human Resources Development' => 'HRD',
-    'Finance and Accounting' => 'FNA',
-    'Marketing Division' => 'MKT',
+    'CEO / COO / CSO / DIRECTOR'  =>  'DIR',
+    'Brand Marketing Division'  =>  'MKT',
+    'Brand Stratetgic Department'  =>  'BST',
+    'Business & Partnership Division'  =>  'BNP',
+    'Business Analyst'  =>  'BSA',
+    'Business Development'  =>  'BSD',
+    'Business Support Department'  =>  'BSP',
+    'Community & Partnership'  =>  'COM',
+    'Creative Design Department'  =>  'CDS',
+    'Digital Marketing Department'  =>  'DMT',
+    'EAST Team'  =>  'EAST',
+    'Finance & Accounting Department'  =>  'FNA',
+    'General Purchasing Section'  =>  'GPR',
+    'IT Service Section'  =>  'ICT',
+    'Key Account Manager'  =>  'KAM',
+    'Material Sourcing & Development'  =>  'MAT',
+    'Procurement Division'  =>  'PRC',
+    'Product Design Division'  =>  'DSN',
+    'Product Development Division'  =>  'PDV',
+    'Product Innovation Department'  =>  'PIN',
+    'Product Manager'  =>  'PRM',
+    'Product Sourcing & Development'  =>  'PRD',
+    'Quality Assurance Department'  =>  'QUA',
+    'Quaity Control Department'  =>  'QUC',
+    'Quality Management Division'  =>  'QUM',
+    'SBU Women & Kids'  =>  'WNK',
+    'Technical Design Department'  =>  'TDS',
+    'Transformation Management Office'  =>  'TMO',
+    'Visual Creative Department'  =>  'VIS',
+
   ];
 
   // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
@@ -167,21 +193,36 @@ class DokumenController extends Controller
     $sort = $request->input('sort', 'desc');
     $search = $request->input('search');
 
-    $dokumens = Dokumen::query();
+    // Ganti baris ini
+    // $dokumens = Dokumen::query();
+
+    // Menjadi seperti ini
+    $query = Dokumen::with('requestor'); // <-- TAMBAHKAN with('requestor')
 
     if ($filterJenis) {
-      $dokumens->where('jenis_dokumen', $filterJenis);
+      $query->where('jenis_dokumen', $filterJenis);
     }
 
     if ($search) {
-      $dokumens->where('perihal', 'like', '%' . $search . '%')
+      $query->where(function($q) use ($search){
+          $q->where('perihal', 'like', '%' . $search . '%')
         ->orWhere('nomor_dokumen', 'like', '%' . $search . '%');
+      });
     }
 
-    $dokumens->orderBy($orderBy, $sort);
+    $query->orderBy($orderBy, $sort);
 
-    $dokumens = $dokumens->paginate(15);
+    $dokumens = $query->paginate(15);
 
     return view('dokumen.admin', compact('dokumens', 'filterJenis', 'orderBy', 'sort', 'search'));
+  }
+
+  public function destroy(Dokumen $dokumen)
+  {
+    // Hapus record dokumen
+    $dokumen->delete();
+
+    // Redirect kembali ke dashboard dengan pesan sukses
+    return redirect()->route('dashboard')->with('success', 'Dokumen berhasil dihapus.');
   }
 }
