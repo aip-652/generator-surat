@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/app
       - ./docker/entrypoint.sh:/entrypoint.sh
+      - /app/vendor
     entrypoint: ["sh", "/entrypoint.sh"]
     networks:
       - surat-app_network
