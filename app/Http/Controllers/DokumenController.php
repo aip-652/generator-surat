@@ -7,6 +7,7 @@ use App\Models\Dokumen;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Models\AdminLog;
 
 class DokumenController extends Controller
 {
@@ -214,7 +215,7 @@ class DokumenController extends Controller
 
     $dokumens = $query->paginate(15);
 
-    return view('dokumen.admin', compact('dokumens', 'filterJenis', 'orderBy', 'sort', 'search'));
+    return view('dokumen.dashboard', compact('dokumens', 'filterJenis', 'orderBy', 'sort', 'search'));
   }
 
   public function destroy(Dokumen $dokumen)
@@ -222,7 +223,125 @@ class DokumenController extends Controller
     // Hapus record dokumen
     $dokumen->delete();
 
+    // AdminLog::create([
+    //   'user_id' => Auth::id(),
+    //   'action' => 'deleted',
+    //   'loggable_id' => $dokumen->id,
+    //   'loggable_type' => Dokumen::class,
+    //   'details' => "Dokumen '{$dokumen->perihal}' dengan nomor {$dokumen->nomor_dokumen} dihapus.",
+    // ]);
+
     // Redirect kembali ke dashboard dengan pesan sukses
     return redirect()->route('dashboard')->with('success', 'Dokumen berhasil dihapus.');
+  }
+
+  public function edit(Dokumen $dokumen)
+  {
+    // Kirim data dokumen ke view
+    return view('dokumen.edit', compact('dokumen'));
+  }
+
+  /**
+   * Update the specified document in storage.
+   */
+  public function update(Request $request, Dokumen $dokumen)
+  {
+    $request->validate([
+      'perihal' => 'required|string|max:255',
+      'kepada' => 'nullable|string|max:255',
+      'pic' => 'required|string|max:255',
+    ]);
+
+    // Simpan data lama sebelum diupdate
+    $oldData = $dokumen->getOriginal();
+
+    // Lakukan update
+    $dokumen->update($request->only(['perihal', 'kepada', 'pic']));
+
+    // Bangun string detail perubahan
+    $details = "Dokumen '{$dokumen->perihal}' diperbarui. Perubahan: ";
+    $changes = [];
+    foreach ($dokumen->getChanges() as $key => $value) {
+      if ($key === 'updated_at') continue; // Abaikan kolom updated_at
+      $changes[] = "kolom '{$key}' dari '{$oldData[$key]}' menjadi '{$value}'";
+    }
+
+    // AdminLog::create([
+    //   'user_id' => Auth::id(),
+    //   'action' => 'updated',
+    //   'loggable_id' => $dokumen->id,
+    //   'loggable_type' => Dokumen::class,
+    //   'details' => $details . implode(', ', $changes), // Gabungkan detail
+    // ]);
+
+    return redirect()->route('dashboard')->with('success', 'Dokumen berhasil diperbarui.');
+  }
+
+  /**
+   * Simpan dokumen backdate dengan penomoran khusus.
+   */
+  public function storeBackdate(Request $request)
+  {
+    $request->validate([
+      'tanggal_backdate' => 'required|date|before:today',      'jenis_dokumen' => 'required|in:memo_internal,surat_keluar',
+      'kode_spesifik' => 'required|string',
+      'perihal' => 'required|string',
+      'kepada' => 'nullable|string',
+      'pic' => 'required|string',
+    ]);
+
+    $tanggal = Carbon::parse($request->tanggal_backdate);
+    $bulanRomawi = $this->getRomawi($tanggal->month);
+    $tahun = $tanggal->year;
+
+    $nomorSurat = '';
+    $dataToCreate = [
+      'jenis_dokumen' => $request->jenis_dokumen,
+      'perihal' => $request->perihal,
+      'kepada' => $request->kepada,
+      'pic' => $request->pic,
+      'email_requestor' => Auth::user()->email,
+      'tanggal' => $tanggal->toDateString(),
+    ];
+
+    if ($request->jenis_dokumen == 'memo_internal') {
+      $unitKerjaCode = $this->unitKerjaMap[$request->kode_spesifik] ?? 'UNKNOWN';
+
+      $nomorUrutHariItu = Dokumen::where('jenis_dokumen', 'memo_internal')
+        ->where('unit_kerja', $unitKerjaCode)
+        ->whereDate('tanggal', $tanggal->toDateString())
+        ->count();
+
+      // LOGIKA BARU: Tambahkan '1' di belakang nomor urut
+      $nomorUrutEmpatDigit = str_pad($nomorUrutHariItu + 1, 3, '0', STR_PAD_LEFT) . '1';
+
+      $nomorSurat = "{$unitKerjaCode}-{$nomorUrutEmpatDigit}.{$tanggal->format('d')}/{$bulanRomawi}/{$tahun}";
+      $dataToCreate['unit_kerja'] = $unitKerjaCode;
+    } elseif ($request->jenis_dokumen == 'surat_keluar') {
+      $kodeSuratCode = $this->kodeSuratMap[$request->kode_spesifik] ?? 'UNKNOWN';
+
+      $nomorUrutHariItu = Dokumen::where('jenis_dokumen', 'surat_keluar')
+        ->where('kode_surat', $kodeSuratCode)
+        ->whereDate('tanggal', '!=', Carbon::now()->toDateString()) // Hitung semua backdate sebelumnya
+        ->count();
+
+      // LOGIKA BARU: Tambahkan '1' di belakang nomor urut
+      $nomorUrutEmpatDigit = str_pad($nomorUrutHariItu + 1, 3, '0', STR_PAD_LEFT) . '1';
+
+      $nomorSurat = "{$kodeSuratCode}-{$nomorUrutEmpatDigit}.{$tanggal->format('d')}/72425/{$bulanRomawi}/{$tahun}";
+      $dataToCreate['kode_surat'] = $kodeSuratCode;
+    }
+
+    $dataToCreate['nomor_dokumen'] = $nomorSurat;
+    Dokumen::create($dataToCreate);
+
+    return redirect()->route('dashboard')->with('success', 'Dokumen backdate berhasil dibuat dengan nomor: ' . $nomorSurat);
+  }
+
+  public function createBackdate()
+  {
+    $unitKerja = array_keys($this->unitKerjaMap);
+    $kodeSurat = array_keys($this->kodeSuratMap);
+    return view('dokumen.create_backdate', compact('unitKerja', 'kodeSurat'));
   }
 }

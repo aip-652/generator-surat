@@ -24,37 +24,44 @@
             @method('PUT') {{-- PENTING UNTUK PROSES UPDATE --}}
 
             <div>
-              <x-input-label for="name" :value="__('Nama Lengkap')" />
+              <x-input-label for="name" :value="__('Nama')" />
               <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $user->name)" required autofocus />
               <x-input-error :messages="$errors->get('name')" class="mt-2" />
             </div>
 
             <div>
-              <x-input-label for="email" :value="__('Alamat Email')" />
+              <x-input-label for="email" :value="__('Email')" />
               <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $user->email)" required />
               <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
+            <!-- Password Baru (Opsional) -->
+            <div x-data="{ show: false }">
+              <x-input-label for="password" :value="__('Password Baru (Opsional)')" />
+              <div class="relative">
+                <x-text-input id="password" class="block mt-1 w-full" ::type="show ? 'text' : 'password'" name="password" placeholder="Kosongkan jika tidak diubah" />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                  <i class="fas cursor-pointer text-gray-500" :class="{'fa-eye': !show, 'fa-eye-slash': show}" @click="show = !show"></i>
+                </div>
+              </div>
+              <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
+
+            <!-- Konfirmasi Password Baru -->
             <div>
-              <x-input-label for="role" :value="__('Peran (Role)')" />
+              <x-input-label for="password_confirmation" :value="__('Konfirmasi Password Baru')" />
+              <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" placeholder="Ulangi password baru" />
+              <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
+
+            <div>
+              <x-input-label for="role" :value="__('Role')" />
               <x-select-input id="role" name="role" class="block mt-1 w-full" required>
                 <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
                 <option value="special" {{ old('role', $user->role) == 'special' ? 'selected' : '' }}>Special</option>
                 <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
               </x-select-input>
               <x-input-error :messages="$errors->get('role')" class="mt-2" />
-            </div>
-
-            <div>
-              <x-input-label for="password" :value="__('Password Baru (Opsional)')" />
-              <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" placeholder="Kosongkan jika tidak diubah" />
-              <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
-
-            <div>
-              <x-input-label for="password_confirmation" :value="__('Konfirmasi Password Baru')" />
-              <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" placeholder="Ulangi password baru" />
-              <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end">

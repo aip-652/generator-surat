@@ -14,7 +14,7 @@
     x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">{{ __('Hapus') }}</x-danger-button>
 
   <x-modal name="confirm-user-deletion" focusable>
-    <form method="post" action="{{ route('users.destroy', $user) }}" class="p-6">
+    <form method="post" action="{{ route('users.destroy', $user->id) }}" class="p-6">
       @csrf
       @method('delete')
 

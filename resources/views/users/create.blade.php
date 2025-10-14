@@ -34,6 +34,18 @@
               <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
+
+            <div x-data="{ show: false }">
+              <x-input-label for="password" :value="__('Password')" />
+              <div class="relative">
+                <x-text-input id="password" class="block mt-1 w-full" ::type="show ? 'text' : 'password'" name="password" required />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                  <i class="fas cursor-pointer text-gray-500" :class="{'fa-eye': !show, 'fa-eye-slash': show}" @click="show = !show"></i>
+                </div>
+              </div>
+              <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
+
             <div>
               <x-input-label for="role" :value="__('Peran (Role)')" />
               <x-select-input id="role" name="role" class="block mt-1 w-full" required>
@@ -42,18 +54,6 @@
                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
               </x-select-input>
               <x-input-error :messages="$errors->get('role')" class="mt-2" />
-            </div>
-
-            <div>
-              <x-input-label for="password" :value="__('Password')" />
-              <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
-              <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
-
-            <div>
-              <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
-              <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
-              <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end">

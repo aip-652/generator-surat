@@ -17,6 +17,11 @@
             <div class="flex items-center space-x-4">
 
               @if(Auth::user()->role === 'admin')
+              <a href="{{ route('logs.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-sm text-white tracking-widest hover:bg-gray-700">
+                <i class="fas fa-history mr-2"></i>
+                Log Aktivitas
+              </a>
+
               <a href="{{ route('users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-sm text-white tracking-widest hover:bg-gray-700">
                 <i class="fas fa-users-cog mr-2"></i>
                 Manage Users
@@ -52,6 +57,12 @@
                       <i class="fas fa-envelope fa-fw mr-2 text-indigo-400"></i>
                       <span>Buat Surat Keluar</span>
                     </a>
+                    @if(in_array(Auth::user()->role, ['admin', 'special']))
+                    <a href="{{ route('dokumen.create.backdate') }}" class="flex items-center px-4 py-2 text-sm text-indigo-800 hover:bg-indigo-100 border-t border-indigo-200" role="menuitem">
+                      <i class="fas fa-calendar-day fa-fw mr-3 text-indigo-400"></i>
+                      <span>Dokumen Backdate</span>
+                    </a>
+                    @endif
                   </div>
                 </div>
               </div>
@@ -94,7 +105,9 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">PIC</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">Requestor</a></th>
+                  @if(Auth::user()->role === 'admin')
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                  @endif
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -118,17 +131,23 @@
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
                   <td class="px-6 py-4">{{ $dokumen->pic }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->email_requestor }}</td>
+                  @if(Auth::user()->role === 'admin')
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    @if(Auth::user()->role === 'admin')
-                    <form action="{{ route('dokumen.destroy', $dokumen) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="inline-flex items-center px-2 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
-                        Delete
-                      </button>
-                    </form>
-                    @endif
+                    <div class="flex items-center space-x-2">
+                      <a href="{{ route('dokumen.edit', $dokumen) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                        Edit
+                      </a>
+
+                      <form action="{{ route('dokumen.destroy', $dokumen) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
+                          Delete
+                        </button>
+                      </form>
+                    </div>
                   </td>
+                  @endif
                 </tr>
                 @empty
                 <tr>

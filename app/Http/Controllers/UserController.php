@@ -7,13 +7,14 @@ use GuzzleHttp\RedirectMiddleware;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; // <-- Import Hash
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;      // <-- Import Rule
+use App\Models\AdminLog;             // <-- Import AdminLog
 
 class UserController extends Controller
 {
   /**
-   * Menampilkan daftar semua pengguna dengan sorting.
+   * Menampilkan daftar semua user dengan sorting.
    */
   public function index(Request $request) // <-- Tambahkan Request $request
   {
@@ -32,7 +33,7 @@ class UserController extends Controller
   }
 
   /**
-   * Tampilkan formulir untuk membuat pengguna baru.
+   * Tampilkan formulir untuk membuat user baru.
    */
   public function create()
   {
@@ -40,7 +41,7 @@ class UserController extends Controller
   }
 
   /**
-   * Simpan pengguna baru ke database.
+   * Simpan user baru ke database.
    */
   public function store(Request $request)
   {
@@ -48,7 +49,7 @@ class UserController extends Controller
     $request->validate([
       'name' => ['required', 'string', 'max:255'],
       'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-      'password' => ['required', 'string', 'min:8', 'confirmed'],
+      'password' => ['required', 'string', 'min:8'],
       'role' => ['required', 'string', Rule::in(['admin', 'user', 'special'])],
     ]);
 
@@ -61,69 +62,80 @@ class UserController extends Controller
     ]);
 
     // 3. Redirect kembali dengan pesan sukses
-    return redirect()->route('users.index')->with('success', 'Pengguna baru berhasil ditambahkan.');
+    return redirect()->route('users.index')->with('success', 'user baru berhasil ditambahkan.');
   }
   /**
-     * Tampilkan formulir untuk mengedit pengguna.
-     */
-    public function edit(User $user) // Laravel akan otomatis mencari user berdasarkan ID
-    {
-        return view('users.edit', compact('user'));
-    }
-
-    /**
-     * Update data pengguna di database.
-     */
-    public function update(Request $request, User $user)
-    {
-        // 1. Validasi input
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', 'string', Rule::in(['admin', 'user', 'special'])],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'], // Password opsional
-        ]);
-
-        // 2. Update data user
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->role = $request->role;
-
-        // Hanya update password jika diisi
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->save();
-
-        // 3. Redirect kembali dengan pesan sukses
-        return redirect()->route('users.index')->with('success', 'Data pengguna berhasil diperbarui.');
-    }
-
-  public function destroy(User $user):RedirectResponse
+   * Tampilkan formulir untuk mengedit user.
+   */
+  public function edit(User $user) // Laravel akan otomatis mencari user berdasarkan ID
   {
-    // dd() akan menghentikan semua proses dan menampilkan informasi ini di layar
-    dd(
-      'User yang akan dihapus:',
-      $user->toArray(),
-      'User yang sedang login:',
-      Auth::user()->toArray(),
-      'Apakah ID mereka sama?',
-      Auth::id() === $user->id
-    );
+    return view('users.edit', compact('user'));
+  }
 
-    if (!$user->exists) {
-      return redirect()->route('users.index')->with('error', 'Gagal: Pengguna yang akan dihapus tidak ditemukan.');
+  /**
+   * Update data user di database.
+   */
+  public function update(Request $request, User $user)
+  {
+    // 1. Validasi input
+    $request->validate([
+      'name' => ['required', 'string', 'max:255'],
+      'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+      'role' => ['required', 'string', Rule::in(['admin', 'user', 'special'])],
+      'password' => ['nullable', 'string', 'min:8', 'confirmed'], // Password opsional
+    ]);
+
+    // 2. Update data user
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->role = $request->role;
+
+    // Hanya update password jika diisi
+    if ($request->filled('password')) {
+      $user->password = Hash::make($request->password);
     }
 
-    // Kode di bawah ini tidak akan pernah dijalankan selama dd() aktif
-    if (Auth::id() === $user->id) {
+    $user->save();
+
+    // AdminLog::create([
+    //   'user_id' => Auth::id(),
+    //   'action' => 'updated',
+    //   'loggable_id' => $user->id,
+    //   'loggable_type' => User::class,
+    //   'details' => "Data user '{$user->name}' diperbarui.",
+    // ]);
+
+    // 3. Redirect kembali dengan pesan sukses
+    return redirect()->route('users.index')->with('success', 'Data user berhasil diperbarui.');
+  }
+
+  public function destroy($id): RedirectResponse
+  {
+    // 1. Cari user secara manual. Jika tidak ketemu, akan gagal dengan error 404.
+    $user = User::find($id);
+
+    // 2. Jika karena suatu alasan user tidak ditemukan, kembali dengan pesan error.
+    if (!$user) {
+      return redirect()->route('users.index')->with('error', 'Gagal: user yang akan dihapus tidak ditemukan.');
+    }
+
+    // 3. Cek jika admin mencoba menghapus dirinya sendiri.
+    if (Auth::id() == $user->id) {
       return redirect()->route('users.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
     }
 
+    // 4. Hapus user secara permanen.
     $user->forceDelete();
 
-    return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
+    // AdminLog::create([
+    //   'user_id' => Auth::id(),
+    //   'action' => 'deleted',
+    //   'loggable_id' => $user->id,
+    //   'loggable_type' => User::class,
+    //   'details' => "user '{$user->name}' dihapus.",
+    // ]);
+
+    // 5. Kembali dengan pesan sukses.
+    return redirect()->route('users.index')->with('success', 'user berhasil dihapus secara permanen.');
   }
-  
 }
