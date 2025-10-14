@@ -15,6 +15,7 @@ php artisan migrate --force
 php artisan storage:link
 php artisan optimize
 php artisan view:cache
+php artisan db:seed --force
 
 # Jalankan PHP-FPM di background untuk menjaga container tetap hidup
 php-fpm
