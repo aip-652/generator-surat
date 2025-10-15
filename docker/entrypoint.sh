@@ -12,10 +12,10 @@ composer install --no-interaction --optimize-autoloader
 
 # Jalankan perintah Artisan
 php artisan migrate --force
+php artisan db:seed --force
 php artisan storage:link
 php artisan optimize
 php artisan view:cache
-php artisan db:seed --force
 
 # Jalankan PHP-FPM di background untuk menjaga container tetap hidup
 php-fpm
