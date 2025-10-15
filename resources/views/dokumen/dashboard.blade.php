@@ -151,7 +151,7 @@
                 </tr>
                 @empty
                 <tr>
-                  <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                  <td colspan="12" class="px-6 py-12 text-center text-gray-500">
                     <i class="fas fa-folder-open fa-3x mb-4"></i>
                     <p class="text-lg">Tidak ada data dokumen yang ditemukan.</p>
                   </td>

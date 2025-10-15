@@ -11,9 +11,9 @@ class UserSeeder extends Seeder
   {
     // CONTOH 1: Membuat satu user Admin spesifik
     User::create([
-      'name' => 'Admin Utama',
-      'email' => 'admin@surat.app',
-      'password' => bcrypt('password123'), // atau Hash::make()
+      'name' => 'Administrator',
+      'email' => 'admin@eigeradventure.id',
+      'password' => bcrypt('P@ssw0rd'), // atau Hash::make()
       'role' => 'admin',
     ]);
 
