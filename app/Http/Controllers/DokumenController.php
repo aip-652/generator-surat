@@ -125,7 +125,11 @@ class DokumenController extends Controller
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 
-    return redirect()->back()->with('success', 'Memo Internal berhasil dibuat dengan nomor: ' . $nomorSurat);
+    return redirect()->route('dokumen.create.memo')
+    ->with([
+        'success' => 'Memo Internal berhasil dibuat dengan nomor: ' . $nomorSurat,
+        'nomor_surat' => $nomorSurat,
+    ]);
   }
 
   /**
@@ -335,7 +339,7 @@ class DokumenController extends Controller
     $dataToCreate['nomor_dokumen'] = $nomorSurat;
     Dokumen::create($dataToCreate);
 
-    return redirect()->route('dashboard')->with('success', 'Dokumen backdate berhasil dibuat dengan nomor: ' . $nomorSurat);
+    return redirect()->route('dokumen.create.backdate')->with('success', 'Dokumen backdate berhasil dibuat dengan nomor: ' . $nomorSurat);
   }
 
   public function createBackdate()

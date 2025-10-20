@@ -23,10 +23,30 @@
           </div>
 
           @if (session('success'))
-          <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded" role="alert">
-            {{ session('success') }}
+          @php
+          $message = session('success');
+          preg_match('/nomor:\s*(.+)$/i', $message, $matches);
+          $nomorSurat = $matches[1] ?? null;
+          @endphp
+
+          <div class="mb-6 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded flex items-center flex-wrap gap-2">
+            <span>
+              Memo Internal berhasil dibuat dengan nomor:
+              <strong>{{ $nomorSurat }}</strong>
+            </span>
+
+            @if ($nomorSurat)
+            <button
+              type="button"
+              onclick="copyNomorSurat('{{ addslashes($nomorSurat) }}')"
+              class="ml-2 inline-flex items-center gap-1 bg-green-600 text-white px-2 py-1 text-sm rounded hover:bg-green-700 transition">
+              <i class="fas fa-copy text-xs"></i>
+              <span>Copy</span>
+            </button>
+            @endif
           </div>
           @endif
+
 
           @if ($errors->any())
           <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -90,4 +110,41 @@
       </div>
     </div>
   </div>
+
+  {{-- Script untuk copy nomor surat --}}
+  <script>
+    function copyNomorSurat(nomor) {
+      navigator.clipboard.writeText(nomor).then(() => {
+        // Toast notif
+        const toast = document.createElement('div');
+        toast.textContent = 'Nomor surat berhasil disalin!';
+        toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-3 py-2 rounded shadow-lg text-sm animate-fade-in';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+      }).catch(err => {
+        alert('Gagal menyalin nomor surat.');
+        console.error(err);
+      });
+    }
+  </script>
+
+  {{-- Animasi kecil untuk toast --}}
+  <style>
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 0.2s ease-out;
+    }
+  </style>
+
 </x-app-layout>

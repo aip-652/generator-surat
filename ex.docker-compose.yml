@@ -1,22 +1,16 @@
-#version: '3.9'
+version: '3.9'
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: surat_app_php_prod
+    image: surat_app_php
     container_name: surat_app
     restart: unless-stopped
     working_dir: /var/www
-    environment:
-      APP_ENV: production
-      APP_DEBUG: 'false'
-      APP_KEY: ${APP_KEY}
     volumes:
-      - appdata:/var/www  # 👈 mount named volume untuk share ke Nginx
-      - ./storage:/var/www/storage
-      - ./bootstrap/cache:/var/www/bootstrap/cache
+      - ./:/var/www
     depends_on:
       - db
     networks:
@@ -28,9 +22,8 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      - appdata:/var/www
+      - ./:/var/www
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
@@ -47,6 +40,8 @@ services:
       POSTGRES_PASSWORD: SuratAppP@ssw0rd
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - surat_net
 
@@ -55,4 +50,3 @@ networks:
 
 volumes:
   pgdata:
-  appdata:

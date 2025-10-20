@@ -2,9 +2,13 @@
 FROM php:8.2-fpm
 
 # Install dependensi sistem & ekstensi PostgreSQL
-RUN apt-get update && apt-get install -y \
-    git curl libpq-dev libpng-dev libjpeg-dev libfreetype6-dev zip unzip \
-    && docker-php-ext-install pdo pdo_pgsql pgsql gd
+RUN apt-get update --fix-missing && apt-get install -y \
+    apt-transport-https ca-certificates lsb-release gnupg curl \
+    git zip unzip supervisor \
+    libpq-dev libpng-dev libjpeg-dev libfreetype6-dev \
+    nodejs npm postgresql-client \
+    && docker-php-ext-install pdo pdo_pgsql pgsql gd bcmath opcache \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
@@ -15,11 +19,23 @@ WORKDIR /var/www
 # Copy semua file project
 COPY . .
 
+# Pastikan .env ikut ter-copy
+COPY .env .env
+
 # Install dependency Laravel
-RUN composer install --no-dev --optimize-autoloader
+#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Pastikan folder cache ada & writable sebelum artisan command
+RUN mkdir -p /var/www/bootstrap/cache && chmod -R 775 bootstrap/cache \
+    && rm -f bootstrap/cache/packages.php \
+    && php artisan config:clear
+
+# Install dependensi frontend & build
+RUN npm install && npm run build
 
 # Set permission
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN mkdir -p /var/www/storage \
+    && chown -R www-data:www-data /var/www/storage
 
 # Copy entrypoint script
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

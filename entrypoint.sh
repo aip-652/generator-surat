@@ -3,14 +3,22 @@ set -e
 
 # Tunggu database siap
 echo "Menunggu PostgreSQL siap..."
-until pg_isready -h db -p 5432 -U surat_user; do
+until pg_isready -h db -p 5432 -U pgsql; do
   sleep 2
 done
 
 echo "Database siap. Menjalankan setup Laravel..."
 
 # Jalankan setup Laravel otomatis
-php artisan key:generate --force
+
+# Generate APP_KEY hanya jika belum ada
+if [ -z "$(grep APP_KEY= .env | cut -d '=' -f2)" ]; then
+  echo "APP_KEY belum ada, generate baru..."
+  php artisan key:generate --force
+else
+  echo "APP_KEY sudah ada, skip generate."
+fi
+
 php artisan migrate --force
 php artisan storage:link
 php artisan config:cache
