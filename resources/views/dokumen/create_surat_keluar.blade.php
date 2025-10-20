@@ -113,20 +113,34 @@
 
   {{-- Script untuk copy nomor surat --}}
   <script>
-    function copyNomorSurat(nomor) {
-      navigator.clipboard.writeText(nomor).then(() => {
-        // Toast notif
-        const toast = document.createElement('div');
-        toast.textContent = 'Nomor surat berhasil disalin!';
-        toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-3 py-2 rounded shadow-lg text-sm animate-fade-in';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
-      }).catch(err => {
-        alert('Gagal menyalin nomor surat.');
-        console.error(err);
-      });
+function copyNomorSurat(nomor) {
+  // Buat elemen input sementara
+  const tempInput = document.createElement('input');
+  tempInput.value = nomor;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  tempInput.setSelectionRange(0, 99999); // Untuk mobile
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      const toast = document.createElement('div');
+      toast.textContent = '✅ Nomor surat disalin!';
+      toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    } else {
+      alert('Gagal menyalin nomor surat.');
     }
-  </script>
+  } catch (err) {
+    console.error('Gagal menyalin:', err);
+    alert('Gagal menyalin nomor surat.');
+  }
+
+  document.body.removeChild(tempInput);
+}
+</script>
+
 
   {{-- Animasi kecil untuk toast --}}
   <style>

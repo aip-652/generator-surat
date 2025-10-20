@@ -16,8 +16,5 @@ class UserSeeder extends Seeder
       'password' => bcrypt('P@ssw0rd'), // atau Hash::make()
       'role' => 'admin',
     ]);
-
-    // CONTOH 2: Membuat 10 user biasa secara acak menggunakan factory
-    User::factory()->count(10)->create();
   }
 }
