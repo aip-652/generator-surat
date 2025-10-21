@@ -20,7 +20,9 @@ return new class extends Migration
       $table->string('perihal');
       $table->string('kepada')->nullable();
       $table->string('alamat')->nullable();
-      $table->string('email_requestor'); // Menggantikan PIC
+      $table->string('order')->nullable();
+      $table->string('pic')->nullable();
+      //$table->string('email_requestor'); // Menggantikan PIC
       $table->date('tanggal');
       // Kolom 'substansi' dan 'order' sengaja dihilangkan
       $table->timestamps();

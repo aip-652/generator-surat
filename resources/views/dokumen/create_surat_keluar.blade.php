@@ -77,26 +77,26 @@
 
             <div>
               <x-input-label for="perihal" :value="__('Perihal')" />
-              <x-text-input id="perihal" class="block mt-1 w-full" type="text" name="perihal" :value="old('perihal')" required placeholder="Contoh: Undangan Rapat" />
+              <x-text-input id="perihal" class="block mt-1 w-full" type="text" name="perihal" :value="old('perihal')" required />
               <x-input-error :messages="$errors->get('perihal')" class="mt-2" />
             </div>
 
             <div>
               <x-input-label for="kepada" :value="__('Kepada')" />
-              <x-text-input id="kepada" class="block mt-1 w-full" type="text" name="kepada" :value="old('kepada')" placeholder="Contoh: Bapak/Ibu [Nama Penerima]" />
+              <x-text-input id="kepada" class="block mt-1 w-full" type="text" name="kepada" :value="old('kepada')" />
               <x-input-error :messages="$errors->get('kepada')" class="mt-2" />
             </div>
 
             <div>
               <x-input-label for="alamat" :value="__('Alamat (optional)')" />
-              <x-textarea-input id="alamat" name="alamat" class="block mt-1 w-full" rows="3" placeholder="Contoh: Jl. Merdeka No. 10, Jakarta">{{ old('alamat') }}</x-textarea-input>
+              <x-textarea-input id="alamat" name="alamat" class="block mt-1 w-full" rows="3" >{{ old('alamat') }}</x-textarea-input>
               <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
             </div>
 
             <div>
-              <x-input-label for="pic" :value="__('PIC')" />
-              <x-text-input id="pic" class="block mt-1 w-full" type="text" name="pic" :value="old('pic')" required placeholder="Nama penanggung jawab" />
-              <x-input-error :messages="$errors->get('pic')" class="mt-2" />
+              <x-input-label for="order" :value="__('Order')" />
+              <x-text-input id="order" class="block mt-1 w-full" type="text" name="order" :value="old('order')"/>
+              <x-input-error :messages="$errors->get('order')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end">

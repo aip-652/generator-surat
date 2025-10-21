@@ -10,11 +10,13 @@ class UserSeeder extends Seeder
   public function run(): void
   {
     // CONTOH 1: Membuat satu user Admin spesifik
-    User::create([
+    if (!User::where('email','admin@eigeradventure.id')->exist()){    
+      User::create([
       'name' => 'Administrator',
       'email' => 'admin@eigeradventure.id',
       'password' => bcrypt('P@ssw0rd'), // atau Hash::make()
       'role' => 'admin',
     ]);
+   }
   }
 }

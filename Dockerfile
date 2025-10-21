@@ -20,11 +20,20 @@ WORKDIR /var/www
 COPY . .
 
 # Pastikan .env ikut ter-copy
-COPY .env .env
+COPY .env /var/www/.env
 
 # Install dependency Laravel
 #RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Generate APP_KEY hanya jika belum ada
+RUN if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then \
+  echo "APP_KEY belum ada, generate baru..." \
+  php artisan key:generate --force; \
+else \
+  echo "APP_KEY sudah ada, skip generate."; \
+fi
+
 # Pastikan folder cache ada & writable sebelum artisan command
 RUN mkdir -p /var/www/bootstrap/cache && chmod -R 775 bootstrap/cache \
     && rm -f bootstrap/cache/packages.php \

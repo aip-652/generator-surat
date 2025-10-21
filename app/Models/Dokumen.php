@@ -56,8 +56,8 @@ class Dokumen extends Model
     'perihal',
     'kepada',
     'alamat',
-    'pic',
-    'email_requestor', // Nama field baru
+    'order',
+    'pic', // Nama field baru
     'tanggal',
   ];
 
@@ -65,6 +65,6 @@ class Dokumen extends Model
   {
     // 'email_requestor' adalah kolom di tabel 'dokumens'
     // 'email' adalah kolom di tabel 'users'
-    return $this->belongsTo(User::class, 'email_requestor', 'email');
+    return $this->belongsTo(User::class, 'pic', 'name');
   }
 }

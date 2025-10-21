@@ -103,8 +103,8 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('tanggal') }}" class="hover:underline">Tanggal</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('perihal') }}" class="hover:underline">Perihal</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">PIC</a></th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">Requestor</a></th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">Order</a></th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">PIC</a></th>
                   @if(Auth::user()->role === 'admin')
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                   @endif
@@ -129,8 +129,8 @@
                   <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($dokumen->tanggal)->format('d/m/Y') }}</td>
                   <td class="px-6 py-4">{{ $dokumen->perihal }}</td>
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
-                  <td class="px-6 py-4">{{ $dokumen->pic }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->email_requestor }}</td>
+                  <td class="px-6 py-4">{{ $dokumen->order }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->pic }}</td>
                   @if(Auth::user()->role === 'admin')
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex items-center space-x-2">

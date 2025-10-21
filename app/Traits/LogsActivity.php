@@ -42,8 +42,8 @@ trait LogsActivity
     $modelName = class_basename($model); // Mendapat nama model, misal: "User" atau "Dokumen"
 
     if ($action === 'created') {
-      $identifier = $model->name ?? $model->perihal ?? $model->nomor_dokumen;
-      $details = "{$modelName} baru '{$identifier}' telah dibuat.";
+      $identifier = $model->name ?? $model->nomor_dokumen ?? $model->perihal;
+      $details = "{$modelName} baru {$identifier} telah dibuat.";
     } elseif ($action === 'deleted') {
       $identifier = $model->name ?? $model->nomor_dokumen ?? $model->perihal;
       $details = "{$modelName} {$identifier} dihapus.";

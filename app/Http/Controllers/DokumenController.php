@@ -90,7 +90,7 @@ class DokumenController extends Controller
       'perihal' => 'required',
       'kepada' => 'nullable',
       'alamat' => 'nullable',
-      'pic' => 'required|string',
+      'order' => 'nullable|string',
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -120,8 +120,8 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'pic' => $request->pic, // <-- Ambil dari input
-      'email_requestor' => Auth::user()->email, // <-- Ambil otomatis dari user login      
+      'order' => $request->order, // <-- Ambil dari input
+      'pic' => Auth::user()->name, // <-- Ambil otomatis dari user login      
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 
@@ -142,7 +142,7 @@ class DokumenController extends Controller
       'perihal' => 'required',
       'kepada' => 'nullable',
       'alamat' => 'nullable',
-      'pic' => 'required|string', // Validasi untuk PIC    
+      'order' => 'nullable|string', // Validasi untuk PIC    
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -171,8 +171,8 @@ class DokumenController extends Controller
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
       'alamat' => $request->alamat,
-      'pic' => $request->pic, // <-- Ambil dari input
-      'email_requestor' => Auth::user()->email, // <-- Ambil otomatis dari user login      
+      'order' => $request->order, // <-- Ambil dari input
+      'pic' => Auth::user()->name, // <-- Ambil otomatis dari user login      
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 
@@ -253,14 +253,14 @@ class DokumenController extends Controller
     $request->validate([
       'perihal' => 'required|string|max:255',
       'kepada' => 'nullable|string|max:255',
-      'pic' => 'required|string|max:255',
+      'order' => 'nullable|string|max:255',
     ]);
 
     // Simpan data lama sebelum diupdate
     $oldData = $dokumen->getOriginal();
 
     // Lakukan update
-    $dokumen->update($request->only(['perihal', 'kepada', 'pic']));
+    $dokumen->update($request->only(['perihal', 'kepada', 'order']));
 
     // Bangun string detail perubahan
     $details = "Dokumen '{$dokumen->perihal}' diperbarui. Perubahan: ";
@@ -291,7 +291,7 @@ class DokumenController extends Controller
       'kode_spesifik' => 'required|string',
       'perihal' => 'required|string',
       'kepada' => 'nullable|string',
-      'pic' => 'required|string',
+      'order' => 'nullable|string',
     ]);
 
     $tanggal = Carbon::parse($request->tanggal_backdate);
@@ -303,8 +303,8 @@ class DokumenController extends Controller
       'jenis_dokumen' => $request->jenis_dokumen,
       'perihal' => $request->perihal,
       'kepada' => $request->kepada,
-      'pic' => $request->pic,
-      'email_requestor' => Auth::user()->email,
+      'order' => $request->order,
+      'pic' => Auth::user()->name,
       'tanggal' => $tanggal->toDateString(),
     ];
 

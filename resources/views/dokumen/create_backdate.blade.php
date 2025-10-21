@@ -112,8 +112,8 @@
             </div>
 
             <div x-show="selectedType" style="display: none;">
-              <x-input-label for="pic" :value="__('PIC')" />
-              <x-text-input id="pic" class="block mt-1 w-full" type="text" name="pic" :value="old('pic')" required />
+              <x-input-label for="order" :value="__('Order')" />
+              <x-text-input id="order" class="block mt-1 w-full" type="text" name="order" :value="old('order')" />
             </div>
 
             <div class="flex items-center justify-end" x-show="selectedType" style="display: none;">
