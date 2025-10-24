@@ -54,7 +54,7 @@ class DokumenController extends Controller
     'Berita Acara' => 'BA',
     'Berita Acara Serah Terima' => 'BAST',
     'Berita Acara Kesepakatan' => 'BAK',
-    'Surat Perintah' => 'SPK',
+    'Surat Perintah Kerja' => 'SPK',
     'Kebijakan' => 'K',
     'Retur Promosi' => 'SRP',
     'Offering Letter' => 'OL',
@@ -143,12 +143,19 @@ class DokumenController extends Controller
       'kepada' => 'nullable',
       'alamat' => 'nullable',
       'order' => 'nullable|string', // Validasi untuk PIC    
+      'tanggal_manual' => 'nullable|date',
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
     $kodeSuratCode = $this->kodeSuratMap[$request->kode_surat] ?? 'UNKNOWN';
 
-    $tanggal = Carbon::now();
+    // Jika kode surat Perjanjian atau Surat Keterangan, gunakan tanggal dari input
+    if (in_array($request->kode_surat, ['Perjanjian', 'Surat Perintah Kerja']) && $request->filled('tanggal_manual')) {
+       $tanggal = Carbon::parse($request->tanggal_manual);
+    } else {
+       $tanggal = Carbon::now();
+    }
+
     $bulanRomawi = $this->getRomawi($tanggal->format('m'));
     $tahun = $tanggal->format('Y');
 

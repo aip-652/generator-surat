@@ -9,7 +9,6 @@
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 md:p-8 bg-white border-b border-gray-200">
-
           <div class="flex items-center mb-8">
             <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-150">
               <i class="fas fa-arrow-left text-gray-700"></i>
@@ -75,6 +74,12 @@
               <x-input-error :messages="$errors->get('kode_surat')" class="mt-2" />
             </div>
 
+	    <div id="tanggal-container" class="hidden">
+	      <x-input-label for="tanggal_manual" :value="__('Tanggal Surat (opsional)')" />
+	      <x-text-input id="tanggal_manual" class="block mt-1 w-full" type="date" name="tanggal_manual" :value="old('tanggal_manual')" />
+	      <x-input-error :messages="$errors->get('tanggal_manual')" class="mt-2" />
+	    </div>
+
             <div>
               <x-input-label for="perihal" :value="__('Perihal')" />
               <x-text-input id="perihal" class="block mt-1 w-full" type="text" name="perihal" :value="old('perihal')" required />
@@ -105,7 +110,6 @@
               </x-primary-button>
             </div>
           </form>
-
         </div>
       </div>
     </div>
@@ -113,33 +117,51 @@
 
   {{-- Script untuk copy nomor surat --}}
   <script>
-function copyNomorSurat(nomor) {
-  // Buat elemen input sementara
-  const tempInput = document.createElement('input');
-  tempInput.value = nomor;
-  document.body.appendChild(tempInput);
-  tempInput.select();
-  tempInput.setSelectionRange(0, 99999); // Untuk mobile
 
-  try {
-    const successful = document.execCommand('copy');
-    if (successful) {
-      const toast = document.createElement('div');
-      toast.textContent = '✅ Nomor surat disalin!';
-      toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
-    } else {
+  document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('kode_surat');
+    const tanggalContainer = document.getElementById('tanggal-container');
+
+    function toggleTanggal() {
+      const selected = select.value;
+      if (selected === 'Perjanjian' || selected === 'Surat Perintah Kerja') {
+        tanggalContainer.classList.remove('hidden');
+      } else {
+        tanggalContainer.classList.add('hidden');
+      }
+    }
+
+    select.addEventListener('change', toggleTanggal);
+    toggleTanggal(); // cek saat load awal
+  });
+
+  function copyNomorSurat(nomor) {
+    // Buat elemen input sementara
+    const tempInput = document.createElement('input');
+    tempInput.value = nomor;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999); // Untuk mobile
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        const toast = document.createElement('div');
+        toast.textContent = '✅ Nomor surat disalin!';
+        toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+      } else {
+        alert('Gagal menyalin nomor surat.');
+      }
+    } catch (err) {
+      console.error('Gagal menyalin:', err);
       alert('Gagal menyalin nomor surat.');
     }
-  } catch (err) {
-    console.error('Gagal menyalin:', err);
-    alert('Gagal menyalin nomor surat.');
-  }
 
-  document.body.removeChild(tempInput);
-}
-</script>
+    document.body.removeChild(tempInput);
+  }
+  </script>
 
 
   {{-- Animasi kecil untuk toast --}}

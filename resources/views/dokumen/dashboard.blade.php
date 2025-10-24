@@ -100,7 +100,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('jenis_dokumen') }}" class="hover:underline">Jenis</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('nomor_dokumen') }}" class="hover:underline">Nomor Surat</a></th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('tanggal') }}" class="hover:underline">Tanggal</a></th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('created_at') }}" class="hover:underline">Dibuat pada</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('perihal') }}" class="hover:underline">Perihal</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">Order</a></th>
@@ -126,7 +126,7 @@
                     @endif
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap font-mono">{{ $dokumen->nomor_dokumen }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($dokumen->tanggal)->format('d/m/Y') }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ optional(\Carbon\Carbon::parse($dokumen->created_at))->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}</td>
                   <td class="px-6 py-4">{{ $dokumen->perihal }}</td>
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
                   <td class="px-6 py-4">{{ $dokumen->order }}</td>
