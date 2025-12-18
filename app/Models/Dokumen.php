@@ -58,6 +58,7 @@ class Dokumen extends Model
     'alamat',
     'order',
     'pic', // Nama field baru
+    'badan_surat',
     'tanggal',
   ];
 

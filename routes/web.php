@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::post('/memo', [DokumenController::class, 'storeMemo'])->name('dokumen.store.memo');
   Route::get('/surat/create', [DokumenController::class, 'createSuratKeluar'])->name('dokumen.create.surat');
   Route::post('/surat', [DokumenController::class, 'storeSuratKeluar'])->name('dokumen.store.surat');
+  Route::get('/dokumen/{dokumen}/pdf', [DokumenController::class, 'downloadPdf'])
+     ->name('dokumen.pdf');
 });
 
 // Grup HANYA untuk ADMIN dan SPECIAL

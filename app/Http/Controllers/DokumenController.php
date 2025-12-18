@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AdminLog;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DokumenController extends Controller
 {
@@ -43,6 +44,14 @@ class DokumenController extends Controller
     'Transformation Management Office'  =>  'TMO',
     'Visual Creative Department'  =>  'VIS',
 
+  ];
+
+  $jabatanChoices = [
+    'Manager Marketing',
+    'Manager Operasional',
+    'Head of IT',
+    'Finance Manager',
+    'HR Business Partner',
   ];
 
   // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
@@ -91,6 +100,7 @@ class DokumenController extends Controller
       'kepada' => 'nullable',
       'alamat' => 'nullable',
       'order' => 'nullable|string',
+      'badan_surat' => 'nullable|string',
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -122,6 +132,7 @@ class DokumenController extends Controller
       'alamat' => $request->alamat,
       'order' => $request->order, // <-- Ambil dari input
       'pic' => Auth::user()->name, // <-- Ambil otomatis dari user login      
+      'badan_surat' => $request->badan_surat,
       'tanggal' => $tanggal->format('Y-m-d'),
     ]);
 
@@ -261,13 +272,14 @@ class DokumenController extends Controller
       'perihal' => 'required|string|max:255',
       'kepada' => 'nullable|string|max:255',
       'order' => 'nullable|string|max:255',
+      'badan_surat' => 'nullable|string',
     ]);
 
     // Simpan data lama sebelum diupdate
     $oldData = $dokumen->getOriginal();
 
     // Lakukan update
-    $dokumen->update($request->only(['perihal', 'kepada', 'order']));
+    $dokumen->update($request->only(['perihal', 'kepada', 'order', 'badan_surat']));
 
     // Bangun string detail perubahan
     $details = "Dokumen '{$dokumen->perihal}' diperbarui. Perubahan: ";
@@ -355,4 +367,21 @@ class DokumenController extends Controller
     $kodeSurat = array_keys($this->kodeSuratMap);
     return view('dokumen.create_backdate', compact('unitKerja', 'kodeSurat'));
   }
+
+  public function downloadPdf(Dokumen $dokumen)
+{
+    $safeFilename = str_replace(['/', '\\'], '-', $dokumen->nomor_dokumen);
+
+    $pdf = Pdf::loadView('dokumen.pdf_template', compact('dokumen'));
+
+    return request()->boolean('preview')
+        ? response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header(
+                'Content-Disposition',
+                'inline; filename="dokumen-'.$safeFilename.'.pdf"'
+            )
+        : $pdf->download('dokumen-'.$safeFilename.'.pdf');
+}
+
 }

@@ -19,8 +19,9 @@ echo "Database siap. Menjalankan setup Laravel..."
 #  echo "APP_KEY sudah ada, skip generate."
 #fi
 
+composer require barryvdh/laravel-dompdf
 php artisan migrate --force
-#php artisan db:seed --force
+php artisan db:seed --force
 php artisan storage:link
 php artisan config:cache
 php artisan route:cache

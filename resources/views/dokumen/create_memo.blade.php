@@ -96,6 +96,14 @@
               <x-input-error :messages="$errors->get('order')" class="mt-2" />
             </div>
 
+            <div>
+              <x-input-label for="badan_surat" :value="__('Badan Surat / Isi Memo')" />
+              <textarea id="badan_surat" name="badan_surat"
+                class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                rows="6" required>{{ old('badan_surat') }}</textarea>
+              <x-input-error :messages="$errors->get('badan_surat')" class="mt-2" />
+            </div>
+
             <div class="flex items-center justify-end">
               <x-primary-button>
                 {{ __('Buat Memo') }}

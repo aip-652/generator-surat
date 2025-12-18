@@ -22,6 +22,7 @@ return new class extends Migration
       $table->string('alamat')->nullable();
       $table->string('order')->nullable();
       $table->string('pic')->nullable();
+      $table->longText('badan_surat')->nullable();
       //$table->string('email_requestor'); // Menggantikan PIC
       $table->date('tanggal');
       // Kolom 'substansi' dan 'order' sengaja dihilangkan

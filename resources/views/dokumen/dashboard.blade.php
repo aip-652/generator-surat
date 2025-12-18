@@ -105,9 +105,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('kepada') }}" class="hover:underline">Kepada</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('pic') }}" class="hover:underline">Order</a></th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><a href="{{ $sortLink('email_requestor') }}" class="hover:underline">PIC</a></th>
-                  @if(Auth::user()->role === 'admin')
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                  @endif
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -131,9 +129,16 @@
                   <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
                   <td class="px-6 py-4">{{ $dokumen->order }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->pic }}</td>
-                  @if(Auth::user()->role === 'admin')
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex items-center space-x-2">
+                    
+                    {{-- Download PDF --}}
+                    <a href="{{ route('dokumen.pdf', $dokumen->id) }}?preview=1" target="_blank"
+                      class="inline-flex items-center px-3 py-1 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
+                      PDF
+                    </a>
+                    
+                    @if(Auth::user()->role === 'admin')
                       <a href="{{ route('dokumen.edit', $dokumen) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                         Edit
                       </a>
@@ -145,9 +150,9 @@
                           Delete
                         </button>
                       </form>
+                    @endif
                     </div>
                   </td>
-                  @endif
                 </tr>
                 @empty
                 <tr>
