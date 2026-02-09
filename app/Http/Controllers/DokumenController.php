@@ -12,7 +12,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class DokumenController extends Controller
 {
-  // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
   protected $unitKerjaMap = [
     'CEO / COO / CSO / DIRECTOR'  =>  'DIR',
     'Brand Marketing Division'  =>  'MKT',
@@ -43,10 +42,41 @@ class DokumenController extends Controller
     'Technical Design Department'  =>  'TDS',
     'Transformation Management Office'  =>  'TMO',
     'Visual Creative Department'  =>  'VIS',
-
   ];
 
-  $jabatanChoices = [
+  // $tujuanChoices = [
+  //   'CEO / COO / CSO / DIRECTOR'
+  //   'Brand Marketing Division'
+  //   'Brand Stratetgic Department'
+  //   'Business & Partnership Division'
+  //   'Business Analyst'
+  //   'Business Development'
+  //   'Business Support Department'
+  //   'Community & Partnership'
+  //   'Creative Design Department'
+  //   'Digital Marketing Department'
+  //   'EAST Team' 
+  //   'Finance & Accounting Department'
+  //   'General Purchasing Section'
+  //   'IT Service Section'
+  //   'Key Account Manager'
+  //   'Material Sourcing & Development'
+  //   'Procurement Division'
+  //   'Product Design Division'
+  //   'Product Development Division'
+  //   'Product Innovation Department'
+  //   'Product Manager'
+  //   'Product Sourcing & Development'
+  //   'Quality Assurance Department'
+  //   'Quaity Control Department'
+  //   'Quality Management Division'
+  //   'SBU Women & Kids'
+  //   'Technical Design Department'
+  //   'Transformation Management Office'
+  //   'Visual Creative Department'
+  // ];
+
+  public array $jabatanChoices = [
     'Manager Marketing',
     'Manager Operasional',
     'Head of IT',
@@ -54,7 +84,6 @@ class DokumenController extends Controller
     'HR Business Partner',
   ];
 
-  // MAPPING BARU: Nama Lengkap => Kode Singkat (digunakan untuk penomoran & disimpan di DB)
   protected $kodeSuratMap = [
     'Surat' => 'S',
     'BA Nego' => 'BA-NEG',
@@ -76,7 +105,10 @@ class DokumenController extends Controller
   {
     // Mengirimkan nama lengkap (keys dari map) ke view
     $unitKerja = array_keys($this->unitKerjaMap);
-    return view('dokumen.create_memo', compact('unitKerja'));
+    $tujuans = $this->jabatanChoices;
+    $daris = $this->jabatanChoices;
+    $tembusans = $this->jabatanChoices;
+    return view('dokumen.create_memo', compact('unitKerja', 'tujuans', 'daris', 'tembusans'));
   }
 
   /**
@@ -96,11 +128,13 @@ class DokumenController extends Controller
   {
     $request->validate([
       'unit_kerja' => 'required|string',
-      'perihal' => 'required',
-      'kepada' => 'nullable',
-      'alamat' => 'nullable',
-      'order' => 'nullable|string',
-      'badan_surat' => 'nullable|string',
+      'perihal'    => 'required|string',
+      'tujuan'     => 'nullable|string',
+      'dari'       => 'nullable|string',
+      'order'      => 'nullable|string',
+      'lampiran'   => 'nullable|string',
+      'tembusan'   => 'nullable|string',
+      'badan_surat'=> 'nullable|string',
     ]);
 
     // 1. Mengambil kode singkat dari nama lengkap yang dikirim dari form
@@ -123,13 +157,19 @@ class DokumenController extends Controller
     // 3. Membentuk nomor surat: FNA-001.03/X/2025
     $nomorSurat = "{$unitKerjaCode}-{$nomorUrutTigaDigit}.{$tanggal->format('d')}/{$bulanRomawi}/{$tahun}";
 
+    // $toJuan   = $this->jabatanChoices[$request->tujuan] ?? null;
+    // $dari     = $this->jabatanChoices[$request->dari] ?? null;
+    // $toMbusan = $this->jabatanChoices[$request->tembusan] ?? null;
+
     Dokumen::create([
       'jenis_dokumen' => 'memo_internal',
       'unit_kerja' => $unitKerjaCode, // Menyimpan kode singkat
       'nomor_dokumen' => $nomorSurat,
+      'tujuan' => $request->tujuan,
+      'dari' => $request->dari,
+      'lampiran' => $request->lampiran,
+      'tembusan' =>  $request->tembusan,
       'perihal' => $request->perihal,
-      'kepada' => $request->kepada,
-      'alamat' => $request->alamat,
       'order' => $request->order, // <-- Ambil dari input
       'pic' => Auth::user()->name, // <-- Ambil otomatis dari user login      
       'badan_surat' => $request->badan_surat,
@@ -381,6 +421,7 @@ class DokumenController extends Controller
                 'Content-Disposition',
                 'inline; filename="dokumen-'.$safeFilename.'.pdf"'
             )
+            //->setPaper('A4', 'portrait'); 
         : $pdf->download('dokumen-'.$safeFilename.'.pdf');
 }
 

@@ -19,11 +19,14 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
 # Copy semua file project
 COPY . .
+
+RUN mkdir -p bootstrap/cache storage \
+    && chmod -R 775 bootstrap/cache storage
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Pastikan .env ikut ter-copy
 COPY .env /var/www/.env
@@ -34,12 +37,12 @@ COPY .env /var/www/.env
 # RUN composer require barryvdh/laravel-dompdf
 
 # Generate APP_KEY hanya jika belum ada
-RUN if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then \
-  echo "APP_KEY belum ada, generate baru..." \
-  && php artisan key:generate --force; \
-else \
-  echo "APP_KEY sudah ada, skip generate."; \
-fi
+#RUN if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then \
+#  echo "APP_KEY belum ada, generate baru..." \
+#  && php artisan key:generate --force; \
+#else \
+#  echo "APP_KEY sudah ada, skip generate."; \
+#fi
 
 # Pastikan folder cache ada & writable sebelum artisan command
 RUN mkdir -p /var/www/bootstrap/cache \

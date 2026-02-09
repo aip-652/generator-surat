@@ -27,8 +27,8 @@
 	    $message = session('success');
 	    preg_match('/nomor:\s*(.+)$/i', $message, $matches);
 	    $nomorSurat = $matches[1] ?? null;
-	  }
-	  @endphp
+      }
+      @endphp
 
 
           <div class="mb-6 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded flex items-center flex-wrap gap-2">
@@ -77,27 +77,66 @@
               </x-select-input>
               <x-input-error :messages="$errors->get('unit_kerja')" class="mt-2" />
             </div>
-
+            
             <div>
-              <x-input-label for="perihal" :value="__('Perihal')" />
-              <x-text-input id="perihal" class="block mt-1 w-full" type="text" name="perihal" :value="old('perihal')" required />
-              <x-input-error :messages="$errors->get('perihal')" class="mt-2" />
-            </div>
+              <x-input-label for="tujuan" :value="__('Tujuan')" />
+              <x-select-input id="tujuan" class="block mt-1 w-full" name="tujuan" :value="old('tujuan')" required>
+                <option value="" disabled selected>-- Pilih Tujuan --</option>
+                @foreach($tujuans as $tujuan)
+                <option value="{{ $tujuan }}" {{ old('tujuan') == $tujuan ? 'selected' : '' }}>
+                  {{ $tujuan }}
+                </option>
+                @endforeach
+              </x-select-input>
+                <x-input-error :messages="$errors->get('tujuan')" class="mt-2" />
+              </div>
+            
+              <div>
+              <x-input-label for="dari" :value="__('Dari')" />
+              <x-select-input id="dari" class="block mt-1 w-full" name="dari" :value="old('dari')" required>
+                <option value="" disabled selected>-- Pilih dari --</option>
+                @foreach($daris as $dari)
+                <option value="{{ $dari }}" {{ old('dari') == $dari ? 'selected' : '' }}>
+                  {{ $dari }}
+                </option>
+                @endforeach
+              </x-select-input>
+                <x-input-error :messages="$errors->get('dari')" class="mt-2" />
+              </div>
+              
+              <div>
+              <x-input-label for="tembusan" :value="__('Tembusan')" />
+              <x-select-input id="tembusan" class="block mt-1 w-full" name="tembusan" :value="old('tembusan')" required>
+                <option value="" disabled selected>-- Pilih tembusan --</option>
+                @foreach($tembusans as $tembusan)
+                <option value="{{ $tembusan }}" {{ old('tembusan') == $tembusan ? 'selected' : '' }}>
+                  {{ $tembusan }}
+                </option>
+                @endforeach
+              </x-select-input>
+                <x-input-error :messages="$errors->get('dari')" class="mt-2" />
+              </div>
+              
+              <div>
+                <x-input-label for="perihal" :value="__('Perihal')" />
+                <x-text-input id="perihal" class="block mt-1 w-full" type="text" name="perihal" :value="old('perihal')" required />
+                <x-input-error :messages="$errors->get('perihal')" class="mt-2" />
+              </div>
 
-            <div>
-              <x-input-label for="kepada" :value="__('Kepada')" />
-              <x-text-input id="kepada" class="block mt-1 w-full" type="text" name="kepada" :value="old('kepada')" />
-              <x-input-error :messages="$errors->get('kepada')" class="mt-2" />
-            </div>
+              <div>
+                <x-input-label for="lampiran" :value="__('Lampiran')" />
+                <x-text-input id="lampiran" class="block mt-1 w-full" type="text" name="lampiran" :value="old('lampiran')" required />
+                <x-input-error :messages="$errors->get('lampiran')" class="mt-2" />
+              </div>
 
-            <div>
-              <x-input-label for="order" :value="__('Order')" />
-              <x-text-input id="order" class="block mt-1 w-full" type="text" name="order" :value="old('order')" />
-              <x-input-error :messages="$errors->get('order')" class="mt-2" />
-            </div>
-
-            <div>
-              <x-input-label for="badan_surat" :value="__('Badan Surat / Isi Memo')" />
+              <div>
+                <x-input-label for="order" :value="__('Order')" />
+                <x-text-input id="order" class="block mt-1 w-full" type="text" name="order" :value="old('order')" />
+                <x-input-error :messages="$errors->get('order')" class="mt-2" />
+              </div>
+              
+              <div>
+                <x-input-label for="badan_surat" :value="__('Badan Surat / Isi Memo')" />
               <textarea id="badan_surat" name="badan_surat"
                 class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 rows="6" required>{{ old('badan_surat') }}</textarea>

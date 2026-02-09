@@ -20,6 +20,13 @@ echo "Database siap. Menjalankan setup Laravel..."
 #fi
 
 composer require barryvdh/laravel-dompdf
+if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then \
+  echo "APP_KEY belum ada, generate baru..." \
+  && php artisan key:generate --force; \
+else \
+  echo "APP_KEY sudah ada, skip generate."; \
+fi
+
 php artisan migrate --force
 php artisan db:seed --force
 php artisan storage:link

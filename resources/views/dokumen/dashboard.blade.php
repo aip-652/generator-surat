@@ -126,7 +126,7 @@
                   <td class="px-6 py-4 whitespace-nowrap font-mono">{{ $dokumen->nomor_dokumen }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ optional(\Carbon\Carbon::parse($dokumen->created_at))->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}</td>
                   <td class="px-6 py-4">{{ $dokumen->perihal }}</td>
-                  <td class="px-6 py-4">{{ $dokumen->kepada }}</td>
+                  <td class="px-6 py-4">{{ $dokumen->tujuan }}</td>
                   <td class="px-6 py-4">{{ $dokumen->order }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ $dokumen->pic }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

@@ -13,19 +13,28 @@ return new class extends Migration
   {
     Schema::create('dokumens', function (Blueprint $table) {
       $table->id();
+      
+      // Jenis dokumen
       $table->enum('jenis_dokumen', ['memo_internal', 'surat_keluar']);
-      $table->string('unit_kerja')->nullable(); // Kode Singkat Unit Kerja
-      $table->string('kode_surat')->nullable(); // Kode Singkat Jenis Surat
+
+      // ID dokumen
       $table->string('nomor_dokumen')->unique();
-      $table->string('perihal');
-      $table->string('kepada')->nullable();
-      $table->string('alamat')->nullable();
+      $table->string('kode_surat')->nullable();
+      $table->date('tanggal');
+
+      // Struktur organisasi
+      $table->string('unit_kerja')->nullable();
+      $table->string('tujuan')->nullable();
+      $table->string('dari')->nullable();
       $table->string('order')->nullable();
       $table->string('pic')->nullable();
+
+      // Konten dokumen
+      $table->string('perihal');
+      $table->string('lampiran')->nullable();
+      $table->text('tembusan')->nullable();
       $table->longText('badan_surat')->nullable();
-      //$table->string('email_requestor'); // Menggantikan PIC
-      $table->date('tanggal');
-      // Kolom 'substansi' dan 'order' sengaja dihilangkan
+      
       $table->timestamps();
     });
   }
