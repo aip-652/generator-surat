@@ -18,6 +18,11 @@ class Dokumen extends Model
     'kode_surat',
     'tanggal',
 
+    // Tujuan
+    'tNama',
+    'tJabatan',
+    'tPerusahaan',
+
     // Struktur organisasi
     'unit_kerja',
     'tujuan',
@@ -31,6 +36,15 @@ class Dokumen extends Model
     'tembusan',
     'badan_surat',
   ];
+
+  public function getTembusanArrayAttribute()
+{
+    if (!$this->tembusan)
+        return [];
+
+    return explode(',', $this->tembusan);
+}
+
 
   public function requestor()
   {

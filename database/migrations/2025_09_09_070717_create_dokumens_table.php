@@ -29,6 +29,11 @@ return new class extends Migration
       $table->string('order')->nullable();
       $table->string('pic')->nullable();
 
+      // Tujuan
+      $table->string('tNama')->nullable();
+      $table->string('tJabatan')->nullable();
+      $table->string('tPerusahaan')->nullable();
+
       // Konten dokumen
       $table->string('perihal');
       $table->string('lampiran')->nullable();
