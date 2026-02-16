@@ -7,22 +7,18 @@
         @font-face {
             font-family: 'TT Commons';
             src: url("{{ public_path('fonts/tt-commons/TT-Commons-Regular.ttf') }}") format('truetype');
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'TT Commons';
             src: url("{{ public_path('fonts/tt-commons/TT-Commons-Bold.ttf') }}") format('truetype');
             font-weight: bold;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'TT Commons';
             src: url("{{ public_path('fonts/tt-commons/TT-Commons-Italic.ttf') }}") format('truetype');
-            font-weight: italic;
-            font-style: normal;
+            font-style: italic;
         }
 
         @page {
@@ -95,6 +91,11 @@
             height: auto;
             display: block;
         }
+
+        b,
+        strong {
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -154,9 +155,7 @@
     <hr style="width:100%; margin-top:10px;">
 
     <div class="badan-surat">
-        @foreach (preg_split("/\n\s*\n/", trim($dokumen->badan_surat)) as $p)
-            <p>{{ $p }}</p>
-        @endforeach
+        {!! $dokumen->badan_surat !!}
     </div>
 
     <table width="100%" style="margin-top:10pt;">

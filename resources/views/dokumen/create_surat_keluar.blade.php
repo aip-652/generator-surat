@@ -60,7 +60,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('dokumen.store.surat') }}" method="POST" class="space-y-6">
+                    <form action="{{ route('dokumen.store.surat') }}" method="POST" class="space-y-6" id="dokumenform">
                         @csrf
 
                         <div>
@@ -95,12 +95,12 @@
                             <x-input-label value="Tujuan (Jabatan)" />
                             <x-text-input name="tJabatan" class="block mt-1 w-full" :value="old('tJabatan')" required />
                         </div>
-                        
+
                         <div>
                             <x-input-label value="Tujuan (Divisi)" />
                             <x-text-input name="tujuan" class="block mt-1 w-full" :value="old('tujuan')" required />
                         </div>
-                        
+
                         <div>
                             <x-input-label value="Tujuan (Perusahaan)" />
                             <x-text-input name="tPerusahaan" class="block mt-1 w-full" :value="old('tPerusahaan')" required />
@@ -166,12 +166,12 @@
                             <x-input-label for="badan_surat" :value="__('Badan Surat / Isi Memo')" />
                             <textarea id="badan_surat" name="badan_surat"
                                 class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                rows="6" required>{{ old('badan_surat') }}</textarea>
+                                rows="6">{{ old('badan_surat') }}</textarea>
                             <x-input-error :messages="$errors->get('badan_surat')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end">
-                            <x-primary-button>
+                            <x-primary-button type="submit">
                                 {{ __('Buat Surat') }}
                             </x-primary-button>
                         </div>
@@ -226,5 +226,40 @@
 
             document.body.removeChild(tempInput);
         }
+    </script>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let badanEditor;
+            ClassicEditor
+                .create(document.querySelector('#badan_surat'), {
+                    toolbar: [
+                        'heading',
+                        '|',
+                        'bold',
+                        'italic',
+                        'underline',
+                        '|',
+                        'bulletedList',
+                        'numberedList',
+                        '|',
+                        'alignment',
+                        '|',
+                        'undo',
+                        'redo'
+                    ]
+                })
+                .then(editor => {
+                    badanEditor = editor;
+                    document.querySelector('form').addEventListener('submit', function() {
+                        document.querySelector('#badan_surat').value = badanEditor.getData();
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
     </script>
 </x-app-layout>

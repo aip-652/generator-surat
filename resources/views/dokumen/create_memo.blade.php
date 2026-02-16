@@ -62,7 +62,7 @@
                     @endif
 
                     {{-- Form utama --}}
-                    <form action="{{ route('dokumen.store.memo') }}" method="POST" class="space-y-6">
+                    <form action="{{ route('dokumen.store.memo') }}" id="dokumenform" method="POST" class="space-y-6">
                         @csrf
 
                         <div>
@@ -149,12 +149,12 @@
                             <x-input-label for="badan_surat" :value="__('Badan Surat / Isi Memo')" />
                             <textarea id="badan_surat" name="badan_surat"
                                 class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                rows="6" required>{{ old('badan_surat') }}</textarea>
+                                rows="6">{{ old('badan_surat') }}</textarea>
                             <x-input-error :messages="$errors->get('badan_surat')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end">
-                            <x-primary-button>
+                            <x-primary-button type="submit">
                                 {{ __('Buat Memo') }}
                             </x-primary-button>
                         </div>
@@ -195,5 +195,39 @@
         }
     </script>
 
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let badanEditor;
+            ClassicEditor
+                .create(document.querySelector('#badan_surat'), {
+                    toolbar: [
+                        'heading',
+                        '|',
+                        'bold',
+                        'italic',
+                        'underline',
+                        '|',
+                        'bulletedList',
+                        'numberedList',
+                        '|',
+                        'alignment',
+                        '|',
+                        'undo',
+                        'redo'
+                    ]
+                })
+                .then(editor => {
+                    badanEditor = editor;
+                    document.querySelector('form').addEventListener('submit', function() {
+                        document.querySelector('#badan_surat').value = badanEditor.getData();
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    </script>
 
 </x-app-layout>

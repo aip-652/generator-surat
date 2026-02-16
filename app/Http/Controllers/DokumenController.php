@@ -44,7 +44,7 @@ class DokumenController extends Controller
         'Visual Creative Department' => 'VIS',
     ];
 
-    public array $jabatanChoices = ['Manager Marketing', 'Manager Operasional', 'Head of IT', 'Finance Manager', 'HR Business Partner'];
+    public array $jabatanChoices = ['Apparel & Headwear Product Line Manager', 'Brand & Marketing Operation General Manager', 'Brand Communication & Partnership Manager', 'Brand Creative & Visual Production Manager', 'Brand Product Marketing Manager', 'Corporate Secretary Manager', 'Creative Lifestyle Design Manager', 'Creative Performance Design Manager', 'Finance & Accounting Manager', 'Footwear & Equipment Product Line Manager', 'Human Capital & General Affair Manager', 'Material Development Manager', 'Product Engineering & Innovation General Manager', 'Product Manager Eiger Active & Women Series', 'Product Manager Eiger Junior & Teen', 'Product Manager Eiger Mountaineering', 'Product Manager Eiger Riding', 'Product Manager Eiger Tactical', 'Quality Assurance Manager', 'Research & Data Analytics Manager', 'Sr Product Manager', 'Supply Chain General Manager', 'Technical Design Manager'];
 
     protected $kodeSuratMap = [
         'Surat' => 'S',
@@ -65,7 +65,6 @@ class DokumenController extends Controller
      */
     public function createMemo()
     {
-        // Mengirimkan nama lengkap (keys dari map) ke view
         $unitKerja = array_keys($this->unitKerjaMap);
         $tujuans = $this->jabatanChoices;
         $daris = $this->jabatanChoices;
@@ -78,7 +77,6 @@ class DokumenController extends Controller
      */
     public function createSuratKeluar()
     {
-        // Mengirimkan nama lengkap (keys dari map) ke view
         $kodeSurat = array_keys($this->kodeSuratMap);
         $daris = $this->jabatanChoices;
         $tembusans = $this->jabatanChoices;
@@ -118,15 +116,15 @@ class DokumenController extends Controller
 
         Dokumen::create([
             'jenis_dokumen' => 'memo_internal',
-            'unit_kerja' => $unitKerjaCode, // Menyimpan kode singkat
+            'unit_kerja' => $unitKerjaCode,
             'nomor_dokumen' => $nomorSurat,
             'tujuan' => $request->tujuan,
             'dari' => $request->dari,
             'lampiran' => $request->lampiran,
             'tembusan' => $request->tembusan,
             'perihal' => $request->perihal,
-            'order' => $request->order, // <-- Ambil dari input
-            'pic' => Auth::user()->name, // <-- Ambil otomatis dari user login
+            'order' => $request->order,
+            'pic' => Auth::user()->name,
             'badan_surat' => $request->badan_surat,
             'tanggal' => $tanggal->format('Y-m-d'),
         ]);
@@ -257,39 +255,116 @@ class DokumenController extends Controller
 
     public function edit(Dokumen $dokumen)
     {
+        $tujuans = $this->jabatanChoices;
+        $daris = $this->jabatanChoices;
+        $tembusans = $this->jabatanChoices;
+
         // Kirim data dokumen ke view
-        return view('dokumen.edit', compact('dokumen'));
+        if ($dokumen->jenis_dokumen === 'surat_keluar') {
+            return view('dokumen.edit_surat_keluar', compact('dokumen', 'tembusans', 'daris'));
+        }
+
+        return view('dokumen.edit_memo', compact('dokumen', 'tujuans', 'daris', 'tembusans'));
     }
 
-    /**
-     * Update the specified document in storage.
-     */
     public function update(Request $request, Dokumen $dokumen)
     {
-        $request->validate([
-            'perihal' => 'required|string|max:255',
-            'kepada' => 'nullable|string|max:255',
-            'order' => 'nullable|string|max:255',
-            'badan_surat' => 'nullable|string',
-        ]);
+        /*
+    |--------------------------------------------------------------------------
+    | Validasi Berdasarkan Jenis Dokumen
+    |--------------------------------------------------------------------------
+    */
 
-        // Simpan data lama sebelum diupdate
+        if ($dokumen->jenis_dokumen === 'memo_internal') {
+            $validated = $request->validate([
+                'perihal' => 'required|string|max:255',
+                'tujuan' => 'nullable|string|max:255',
+                'badan_surat' => 'required|string',
+                'tembusan' => 'nullable|string',
+                'order' => 'nullable|string',
+            ]);
+        } elseif ($dokumen->jenis_dokumen === 'surat_keluar') {
+            $validated = $request->validate([
+                'tNama' => 'nullable|string',
+                'tJabatan' => 'nullable|string',
+                'tujuan' => 'nullable|string',
+                'tPerusahaan' => 'nullable|string',
+                'perihal' => 'required|string',
+                'dari' => 'nullable|string',
+                'order' => 'nullable|string',
+                'lampiran' => 'nullable|string',
+                'tembusan' => 'nullable|string',
+                'badan_surat' => 'nullable|string',
+            ]);
+        } else {
+            abort(404, 'Jenis dokumen tidak dikenali');
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Parsing Tembusan (delimiter koma)
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($validated['tembusan'])) {
+            $validated['tembusan'] = collect(explode(',', $validated['tembusan']))
+                ->map(fn($item) => trim($item))
+                ->filter()
+                ->implode(', ');
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Simpan Data Lama
+    |--------------------------------------------------------------------------
+    */
+
         $oldData = $dokumen->getOriginal();
 
-        // Lakukan update
-        $dokumen->update($request->only(['perihal', 'kepada', 'order', 'badan_surat']));
+        /*
+    |--------------------------------------------------------------------------
+    | Update Dokumen
+    |--------------------------------------------------------------------------
+    */
 
-        // Bangun string detail perubahan
-        $details = "Dokumen '{$dokumen->perihal}' diperbarui. Perubahan: ";
+        $dokumen->update($validated);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Logging Perubahan (Optional Tapi Bagus)
+    |--------------------------------------------------------------------------
+    */
+
         $changes = [];
+
         foreach ($dokumen->getChanges() as $key => $value) {
             if ($key === 'updated_at') {
                 continue;
-            } // Abaikan kolom updated_at
-            $changes[] = "kolom '{$key}' dari '{$oldData[$key]}' menjadi '{$value}'";
+            }
+
+            $oldValue = $oldData[$key] ?? '-';
+
+            // Sembunyikan konten besar
+            if ($key === 'badan_surat') {
+                $changes[] = "kolom '{$key}' diubah (isi tidak ditampilkan)";
+            } else {
+                $changes[] = "kolom '{$key}' dari '{$oldValue}' menjadi '{$value}'";
+            }
         }
 
-        return redirect()->route('dashboard')->with('success', 'Dokumen berhasil diperbarui.');
+        if (!empty($changes)) {
+            $detailLog = "Dokumen '{$dokumen->nomor_dokumen}' diperbarui: " . implode(', ', $changes);
+
+            \Log::info($detailLog);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Redirect
+    |--------------------------------------------------------------------------
+    */
+
+        return redirect()->route('dashboard')->with('success', 'Dokumen berhasil diperbarui');
     }
 
     /**

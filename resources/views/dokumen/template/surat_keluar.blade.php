@@ -29,8 +29,9 @@
             margin-right: 0.6in;
         }
 
-        b {
-            font-size: 11pt;
+        b, strong {
+            font-size: 12pt;
+            font-weight: 500;
         }
 
         body {
@@ -174,9 +175,7 @@
 
     {{-- ISI SURAT --}}
     <div class="badan-surat">
-        @foreach (preg_split("/\n\s*\n/", trim($dokumen->badan_surat)) as $p)
-            <p>{{ $p }}</p>
-        @endforeach
+        {!! $dokumen->badan_surat !!}
     </div>
 
     {{-- TTD --}}
