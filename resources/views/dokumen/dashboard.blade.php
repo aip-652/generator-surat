@@ -189,12 +189,12 @@
                                                     PDF
                                                 </a>
 
-                                                @if (Auth::user()->role === 'admin')
-                                                    <a href="{{ route('dokumen.edit', $dokumen) }}"
-                                                        class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                                                        Edit
-                                                    </a>
+                                                <a href="{{ route('dokumen.edit', $dokumen) }}"
+                                                    class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                                    Edit
+                                                </a>
 
+                                                @if (Auth::user()->role === 'admin')
                                                     <form action="{{ route('dokumen.destroy', $dokumen) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');">

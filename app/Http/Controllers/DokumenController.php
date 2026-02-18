@@ -179,8 +179,8 @@ class DokumenController extends Controller
         $nomorUrut = $nomorUrutHariIni + 1;
         $nomorUrutTigaDigit = str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
 
-        // 3. Membentuk nomor surat: SK-001.03/72425/X/2025
-        $nomorSurat = "{$kodeSuratCode}-{$nomorUrutTigaDigit}.{$tanggal->format('d')}/72425/{$bulanRomawi}/{$tahun}";
+        // 3. Membentuk nomor surat: SK-001.03/KIND/X/2025
+        $nomorSurat = "{$kodeSuratCode}-{$nomorUrutTigaDigit}.{$tanggal->format('d')}/KIND/{$bulanRomawi}/{$tahun}";
 
         Dokumen::create([
             'jenis_dokumen' => 'surat_keluar',
@@ -201,7 +201,7 @@ class DokumenController extends Controller
         ]);
 
         return redirect()
-            ->back()
+            ->route('dokumen.create.surat')
             ->with('success', 'Surat Keluar berhasil dibuat dengan nomor: ' . $nomorSurat);
     }
 
@@ -370,69 +370,110 @@ class DokumenController extends Controller
     /**
      * Simpan dokumen backdate dengan penomoran khusus.
      */
-    public function storeBackdate(Request $request)
+    public function storeBackdateMemo(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'tanggal_backdate' => 'required|date|before:today',
-            'jenis_dokumen' => 'required|in:memo_internal,surat_keluar',
-            'kode_spesifik' => 'required|string',
+            'unit_kerja' => 'required|string',
             'perihal' => 'required|string',
-            'kepada' => 'nullable|string',
+            'tujuan' => 'nullable|string',
+            'dari' => 'nullable|string',
             'order' => 'nullable|string',
+            'lampiran' => 'nullable|string',
+            'tembusan' => 'nullable|string',
+            'badan_surat' => 'nullable|string',
         ]);
 
-        $tanggal = Carbon::parse($request->tanggal_backdate);
+        $tanggal = Carbon::parse($validated['tanggal_backdate']);
         $bulanRomawi = $this->getRomawi($tanggal->month);
         $tahun = $tanggal->year;
 
-        $nomorSurat = '';
-        $dataToCreate = [
-            'jenis_dokumen' => $request->jenis_dokumen,
-            'perihal' => $request->perihal,
-            'kepada' => $request->kepada,
-            'order' => $request->order,
+        $unitKerjaCode = $this->unitKerjaMap[$validated['unit_kerja']] ?? 'UNKNOWN';
+
+        $count = Dokumen::where('jenis_dokumen', 'memo_internal')->where('unit_kerja', $unitKerjaCode)->whereDate('tanggal', $tanggal)->count();
+
+        $nomorUrut = str_pad($count + 1, 3, '0', STR_PAD_LEFT) . '1';
+
+        $nomorSurat = "{$unitKerjaCode}-{$nomorUrut}.{$tanggal->format('d')}/{$bulanRomawi}/{$tahun}";
+
+        Dokumen::create([
+            'jenis_dokumen' => 'memo_internal',
+            'nomor_dokumen' => $nomorSurat,
+            'unit_kerja' => $unitKerjaCode,
+            'perihal' => $validated['perihal'],
+            'tujuan' => $validated['tujuan'],
+            'dari' => $validated['dari'],
+            'order' => $validated['order'],
+            'lampiran' => $validated['lampiran'],
+            'tembusan' => $validated['tembusan'],
+            'badan_surat' => $validated['badan_surat'],
+            'tanggal' => $tanggal,
             'pic' => Auth::user()->name,
-            'tanggal' => $tanggal->toDateString(),
-        ];
 
-        if ($request->jenis_dokumen == 'memo_internal') {
-            $unitKerjaCode = $this->unitKerjaMap[$request->kode_spesifik] ?? 'UNKNOWN';
+        ]);
 
-            $nomorUrutHariItu = Dokumen::where('jenis_dokumen', 'memo_internal')->where('unit_kerja', $unitKerjaCode)->whereDate('tanggal', $tanggal->toDateString())->count();
+        return redirect()->route('dokumen.create.backdate')->with('success', "Memo berhasil dibuat dengan nomor: {$nomorSurat}");
+    }
 
-            // LOGIKA BARU: Tambahkan '1' di belakang nomor urut
-            $nomorUrutEmpatDigit = str_pad($nomorUrutHariItu + 1, 3, '0', STR_PAD_LEFT) . '1';
+    public function storeBackdateSurat(Request $request)
+    {
+        $validated = $request->validate([
+            'tanggal_backdate' => 'required|date|before:today',
+            'kode_surat' => 'required|string',
+            'perihal' => 'required|string',
+            'tNama' => 'nullable|string',
+            'tJabatan' => 'nullable|string',
+            'tujuan' => 'nullable|string',
+            'tPerusahaan' => 'nullable|string',
+            'dari' => 'nullable|string',
+            'order' => 'nullable|string',
+            'lampiran' => 'nullable|string',
+            'tembusan' => 'nullable|string',
+            'badan_surat' => 'nullable|string',
+        ]);
 
-            $nomorSurat = "{$unitKerjaCode}-{$nomorUrutEmpatDigit}.{$tanggal->format('d')}/{$bulanRomawi}/{$tahun}";
-            $dataToCreate['unit_kerja'] = $unitKerjaCode;
-        } elseif ($request->jenis_dokumen == 'surat_keluar') {
-            $kodeSuratCode = $this->kodeSuratMap[$request->kode_spesifik] ?? 'UNKNOWN';
+        $tanggal = Carbon::parse($validated['tanggal_backdate']);
+        $bulanRomawi = $this->getRomawi($tanggal->month);
+        $tahun = $tanggal->year;
 
-            $nomorUrutHariItu = Dokumen::where('jenis_dokumen', 'surat_keluar')
-                ->where('kode_surat', $kodeSuratCode)
-                ->whereDate('tanggal', '!=', Carbon::now()->toDateString()) // Hitung semua backdate sebelumnya
-                ->count();
+        $kodeSuratCode = $this->kodeSuratMap[$validated['kode_surat']] ?? 'UNKNOWN';
 
-            // LOGIKA BARU: Tambahkan '1' di belakang nomor urut
-            $nomorUrutEmpatDigit = str_pad($nomorUrutHariItu + 1, 3, '0', STR_PAD_LEFT) . '1';
+        $count = Dokumen::where('jenis_dokumen', 'surat_keluar')->where('kode_surat', $kodeSuratCode)->whereDate('tanggal', $tanggal)->count();
 
-            $nomorSurat = "{$kodeSuratCode}-{$nomorUrutEmpatDigit}.{$tanggal->format('d')}/72425/{$bulanRomawi}/{$tahun}";
-            $dataToCreate['kode_surat'] = $kodeSuratCode;
-        }
+        $nomorUrut = str_pad($count + 1, 3, '0', STR_PAD_LEFT) . '1';
 
-        $dataToCreate['nomor_dokumen'] = $nomorSurat;
-        Dokumen::create($dataToCreate);
+        $nomorSurat = "{$kodeSuratCode}-{$nomorUrut}.{$tanggal->format('d')}/KIND/{$bulanRomawi}/{$tahun}";
 
-        return redirect()
-            ->route('dokumen.create.backdate')
-            ->with('success', 'Dokumen backdate berhasil dibuat dengan nomor: ' . $nomorSurat);
+        Dokumen::create([
+            'jenis_dokumen' => 'surat_keluar',
+            'nomor_dokumen' => $nomorSurat,
+            'kode_surat' => $kodeSuratCode,
+            'perihal' => $validated['perihal'],
+            'tujuan' => $validated['tujuan'],
+            'order' => $validated['order'],
+            'tanggal' => $tanggal,
+            'pic' => Auth::user()->name,
+            'tNama' => $validated['tNama'],
+            'tJabatan' => $validated['tJabatan'],
+            'tPerusahaan' => $validated['tPerusahaan'],
+            'dari' => $validated['dari'],
+            'lampiran' => $validated['lampiran'],
+            'tembusan' => $validated['tembusan'],
+            'badan_surat' => $validated['badan_surat'],
+        ]);
+
+        return redirect()->route('dokumen.create.backdate')->with('success', "Surat keluar berhasil dibuat dengan nomor: {$nomorSurat}");
     }
 
     public function createBackdate()
     {
-        $unitKerja = array_keys($this->unitKerjaMap);
-        $kodeSurat = array_keys($this->kodeSuratMap);
-        return view('dokumen.create_backdate', compact('unitKerja', 'kodeSurat'));
+        return view('dokumen.create_backdate', [
+            'unitKerja' => array_keys($this->unitKerjaMap),
+            'kodeSurat' => array_keys($this->kodeSuratMap),
+            'tujuans' => $this->jabatanChoices,
+            'daris' => $this->jabatanChoices,
+            'tembusans' => $this->jabatanChoices,
+        ]);
     }
 
     public function downloadPdf(Dokumen $dokumen)
