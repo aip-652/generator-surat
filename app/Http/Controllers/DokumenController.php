@@ -161,7 +161,12 @@ class DokumenController extends Controller
         $kodeSuratCode = $this->kodeSuratMap[$request->kode_surat] ?? 'UNKNOWN';
 
         // Jika kode surat Perjanjian atau Surat Keterangan, gunakan tanggal dari input
-        if (in_array($request->kode_surat, ['Perjanjian', 'Surat Perintah Kerja']) && $request->filled('tanggal_manual')) {
+        $allowedManual = in_array($request->kode_surat, ['Perjanjian', 'Surat Perintah Kerja']);
+
+        $specialSK = $request->kode_surat === 'Surat Keputusan' && Auth::user()->role === 'special' ||
+	Auth::user()->role === 'admin';
+
+        if (($allowedManual || $specialSK) && $request->filled('tanggal_manual')) {
             $tanggal = Carbon::parse($request->tanggal_manual);
         } else {
             $tanggal = Carbon::now();

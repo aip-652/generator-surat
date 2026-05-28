@@ -65,7 +65,7 @@
 
                         <div>
                             <x-input-label for="kode_surat" :value="__('Jenis Surat')" />
-                            <x-select-input id="kode_surat" name="kode_surat" class="block mt-1 w-full" required>
+                            <x-select-input id="kode_surat" name="kode_surat" class="block mt-1 w-full searchable" required>
                                 <option value="" disabled selected>-- Pilih Jenis Surat --</option>
                                 @foreach ($kodeSurat as $kode)
                                     <option value="{{ $kode }}"
@@ -109,7 +109,7 @@
                         {{-- Dari --}}
                         <div>
                             <x-input-label for="dari" :value="__('Dari')" />
-                            <x-select-input id="dari" class="block mt-1 w-full" name="dari" :value="old('dari')"
+                            <x-select-input id="dari" class="block mt-1 w-full searchable" name="dari" :value="old('dari')"
                                 required>
                                 <option value="" disabled selected>-- Pilih dari --</option>
                                 @foreach ($daris as $dari)
@@ -125,7 +125,7 @@
                             <x-input-label :value="__('Tembusan')" />
 
                             @for ($i = 0; $i < 3; $i++)
-                                <x-select-input name="tembusan[]" class="block mt-2 w-full">
+                                <x-select-input name="tembusan[]" class="block mt-2 w-full searchable">
 
                                     <option value="">-- Pilih tembusan {{ $i + 1 }} --</option>
 
@@ -185,10 +185,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const select = document.getElementById('kode_surat');
             const tanggalContainer = document.getElementById('tanggal-container');
+	    const userRole = "{{ auth()->user()->role }}";
 
             function toggleTanggal() {
                 const selected = select.value;
-                if (selected === 'Perjanjian' || selected === 'Surat Perintah Kerja') {
+                if (selected === 'Perjanjian' || selected === 'Surat Perintah Kerja' || (selected === 'Surat Keputusan' && (userRole === 'special' || userRole === 'admin' ))) {
                     tanggalContainer.classList.remove('hidden');
                 } else {
                     tanggalContainer.classList.add('hidden');

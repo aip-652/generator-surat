@@ -75,7 +75,7 @@
 
                             <div>
                                 <x-input-label for="unit_kerja" :value="__('Unit Kerja')" />
-                                <x-select-input id="unit_kerja" name="unit_kerja" class="block mt-1 w-full" required>
+                                <x-select-input id="unit_kerja" name="unit_kerja" class="block mt-1 w-full searchable" required>
                                     <option value="" disabled selected>-- Pilih Unit Kerja --</option>
                                     @foreach ($unitKerja as $unit)
                                         <option value="{{ $unit }}"
@@ -90,7 +90,7 @@
                             {{-- Tujuan --}}
                             <div>
                                 <x-input-label for="tujuan" :value="__('Tujuan')" />
-                                <x-select-input id="tujuan" class="block mt-1 w-full" name="tujuan"
+                                <x-select-input id="tujuan" class="block mt-1 w-full searchable" name="tujuan"
                                     :value="old('tujuan')" required>
                                     <option value="" disabled selected>-- Pilih Tujuan --</option>
                                     @foreach ($tujuans as $tujuan)
@@ -105,7 +105,7 @@
 
                             <div>
                                 <x-input-label for="dari" :value="__('Dari')" />
-                                <x-select-input id="dari" class="block mt-1 w-full" name="dari"
+                                <x-select-input id="dari" class="block mt-1 w-full searchable" name="dari"
                                     :value="old('dari')" required>
                                     <option value="" disabled selected>-- Pilih dari --</option>
                                     @foreach ($daris as $dari)
@@ -120,7 +120,7 @@
 
                             <div>
                                 <x-input-label for="tembusan" :value="__('Tembusan')" />
-                                <x-select-input id="tembusan" class="block mt-1 w-full" name="tembusan"
+                                <x-select-input id="tembusan" class="block mt-1 w-full searchable" name="tembusan"
                                     :value="old('tembusan')" required>
                                     <option value="" disabled selected>-- Pilih tembusan --</option>
                                     @foreach ($tembusans as $tembusan)
@@ -189,7 +189,7 @@
 
                             <div>
                                 <x-input-label value="Jenis Surat" />
-                                <x-select-input name="kode_surat" class="w-full" required>
+                                <x-select-input name="kode_surat" class="w-full searchable" required>
                                     <option value="">-- Pilih Jenis Surat --</option>
                                     @foreach ($kodeSurat as $kode)
                                         <option value="{{ $kode }}">{{ $kode }}</option>
@@ -209,19 +209,19 @@
 
                             <div>
                                 <x-input-label value="Tujuan (Divisi)" />
-                                <x-text-input name="tujuan" class="block mt-1 w-full" :value="old('tujuan')" required />
+                                <x-text-input name="tujuan" class="block mt-1 w-full searchable" :value="old('tujuan')" required />
                             </div>
 
                             <div>
                                 <x-input-label value="Tujuan (Perusahaan)" />
-                                <x-text-input name="tPerusahaan" class="block mt-1 w-full" :value="old('tPerusahaan')"
+                                <x-text-input name="tPerusahaan" class="block mt-1 w-full searchable" :value="old('tPerusahaan')"
                                     required />
                             </div>
 
                             {{-- Dari --}}
                             <div>
                                 <x-input-label for="dari" :value="__('Dari')" />
-                                <x-select-input id="dari" class="block mt-1 w-full" name="dari"
+                                <x-select-input id="dari" class="block mt-1 w-full searchable" name="dari"
                                     :value="old('dari')" required>
                                     <option value="" disabled selected>-- Pilih dari --</option>
                                     @foreach ($daris as $dari)
@@ -238,7 +238,7 @@
                                 <x-input-label :value="__('Tembusan')" />
 
                                 @for ($i = 0; $i < 3; $i++)
-                                    <x-select-input name="tembusan[]" class="block mt-2 w-full">
+                                    <x-select-input name="tembusan[]" class="block mt-2 w-full searchable">
 
                                         <option value="">-- Pilih tembusan {{ $i + 1 }} --</option>
 

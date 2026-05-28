@@ -1,40 +1,31 @@
 #!/bin/bash
 set -e
 
-# Tunggu database siap
 echo "Menunggu PostgreSQL siap..."
 until pg_isready -h db -p 5432 -U pgsql; do
   sleep 2
 done
 
-echo "Database siap. Menjalankan setup Laravel..."
+echo "Database siap."
 
-# Jalankan setup Laravel otomatis
-
-# Generate APP_KEY hanya jika belum ada
-#if [ -z "$(grep APP_KEY= .env | cut -d '=' -f2)" ]; then
-#  echo "APP_KEY belum ada, generate baru..."
-#  php artisan key:generate --force
-#else
-#  echo "APP_KEY sudah ada, skip generate."
-#fi
-
-composer require barryvdh/laravel-dompdf
-if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then \
-  echo "APP_KEY belum ada, generate baru..." \
-  && php artisan key:generate --force; \
-else \
-  echo "APP_KEY sudah ada, skip generate."; \
+# Generate APP_KEY jika belum ada
+if [ ! -f .env ] || ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then
+  echo "Generate APP_KEY..."
+  php artisan key:generate --force
 fi
 
+echo "Menjalankan migrasi..."
 php artisan migrate --force
-php artisan db:seed --force
-php artisan storage:link
+
+echo "Menjalankan seeder..."
+php artisan db:seed --force || true
+
+echo "Optimasi Laravel..."
+php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "✅ Laravel setup selesai!"
+echo "Laravel siap dijalankan."
 
-# Jalankan PHP-FPM
 exec "$@"
