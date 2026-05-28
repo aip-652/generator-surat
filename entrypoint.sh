@@ -20,11 +20,14 @@ php artisan migrate --force
 echo "Menjalankan seeder..."
 php artisan db:seed --force || true
 
-echo "Optimasi Laravel..."
-php artisan storage:link || true
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# echo "Optimasi Laravel..."
+# php artisan storage:link || true
+# php artisan optimize:clear
+# php artisan config:cache
+# php artisan route:cache
+# php artisan view:cache
+
+php-fpm
 
 echo "Laravel siap dijalankan."
 
